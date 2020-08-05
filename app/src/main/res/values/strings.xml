@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Geo Tracker</string>
+    <string name="button_ok">OK</string>
+    <string name="permissions_are_required">Location permissions are required to track your location.</string>
 </resources>
