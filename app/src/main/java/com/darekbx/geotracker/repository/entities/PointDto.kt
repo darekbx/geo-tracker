@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "point")
 class PointDto(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = "track_id") val trackId: Int,
     @ColumnInfo(name = "timestamp") val timestamp: Long,
     @ColumnInfo(name = "latitude") val latitude: Double,

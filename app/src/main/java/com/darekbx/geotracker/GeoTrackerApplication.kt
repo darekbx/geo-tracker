@@ -4,4 +4,9 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class GeoTrackerApplication : Application()
+class GeoTrackerApplication : Application() {
+
+    companion object {
+        val LOG_TAG = "GeoTracker"
+    }
+}

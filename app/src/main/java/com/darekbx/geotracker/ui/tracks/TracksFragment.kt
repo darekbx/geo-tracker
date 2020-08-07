@@ -1,12 +1,14 @@
 package com.darekbx.geotracker.ui.tracks
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.darekbx.geotracker.AppPreferences
+import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.R
+import com.darekbx.geotracker.location.ForegroundTracker
 import com.darekbx.geotracker.utils.PermissionRequester
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracks.*
@@ -28,8 +30,22 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         }
     }
 
-    private fun startTracking() {
+    override fun onDestroyView() {
+        super.onDestroyView()
 
+        stopTracking()
+    }
+
+    private fun startTracking() {
+        val intent = Intent(context, ForegroundTracker::class.java).apply {
+            putExtra(ForegroundTracker.TRACK_ID_KEY, 10)
+        }
+        context?.startService(intent)
+    }
+
+    private fun stopTracking() {
+        val intent = Intent(context, ForegroundTracker::class.java)
+        context?.stopService(intent)
     }
 
     private fun showPermissionsDeniedDialog() {

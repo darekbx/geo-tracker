@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 
-@Database(entities = arrayOf(PointDto::class, TrackDto::class), version = 1)
+@Database(entities = arrayOf(PointDto::class, TrackDto::class), version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
