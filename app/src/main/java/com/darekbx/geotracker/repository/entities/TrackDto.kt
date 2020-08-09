@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "track")
 class TrackDto(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    @ColumnInfo(name = "label") val label: String?,
+    @PrimaryKey(autoGenerate = true) val id: Long? = null,
+    @ColumnInfo(name = "label") val label: String? = null,
     @ColumnInfo(name = "start_timestamp") val startTimestamp: Long,
-    @ColumnInfo(name = "end_timestamp") val endTimestamp: Long,
-    @ColumnInfo(name = "distance") val distance: Float
+    @ColumnInfo(name = "end_timestamp") val endTimestamp: Long? = null,
+    @ColumnInfo(name = "distance") val distance: Float? = null
 )

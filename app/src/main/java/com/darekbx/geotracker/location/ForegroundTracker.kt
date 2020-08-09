@@ -10,6 +10,7 @@ import android.location.LocationManager
 import android.util.Log
 import com.darekbx.geotracker.GeoTrackerApplication
 import com.darekbx.geotracker.repository.AppDatabase
+import com.darekbx.geotracker.repository.PointDao
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.utils.AppPreferences
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,15 +39,16 @@ class ForegroundTracker : Service() {
     lateinit var appPreferences: AppPreferences
 
     @Inject
-    lateinit var appDatabase: AppDatabase
+    lateinit var pointDao: PointDao
 
-    private var trackId: Int? = null
+    private var trackId: Long? = null
 
     override fun onBind(p0: Intent?) = null
 
     override fun onDestroy() {
         super.onDestroy()
         locationManager?.removeUpdates(locationListener)
+        Log.v(GeoTrackerApplication.LOG_TAG, "Service was destroyed!")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -57,7 +59,7 @@ class ForegroundTracker : Service() {
 
         intent?.let { intent ->
             intent
-                ?.getIntExtra(TRACK_ID_KEY, -1)
+                ?.getLongExtra(TRACK_ID_KEY, -1L)
                 ?.takeIf { it > 0 }
                 ?.let { trackId ->
                     this@ForegroundTracker.trackId = trackId
@@ -70,6 +72,7 @@ class ForegroundTracker : Service() {
 
     @SuppressLint("MissingPermission")
     private fun startLocationUpdates() {
+        Log.v(GeoTrackerApplication.LOG_TAG, "Start location updates")
         val minDistance = appPreferences.gpsMinDistance
         val updateInterval = appPreferences.gpsUpdateInterval
         locationManager.requestLocationUpdates(
@@ -80,7 +83,7 @@ class ForegroundTracker : Service() {
         )
     }
 
-    private val locationListener = object: LocationListener {
+    private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             Log.v(GeoTrackerApplication.LOG_TAG, "Received location update: $location")
 
@@ -90,7 +93,7 @@ class ForegroundTracker : Service() {
         }
     }
 
-    private fun addPoint(trackId: Int, location: Location) {
+    private fun addPoint(trackId: Long, location: Location) {
         ioScope.launch {
             val point = PointDto(
                 null,
@@ -101,7 +104,7 @@ class ForegroundTracker : Service() {
                 location.speed,
                 location.altitude
             )
-            appDatabase.pointDao().add(point)
+            pointDao.add(point)
         }
     }
 

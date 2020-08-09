@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.repository
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -10,10 +11,10 @@ import com.darekbx.geotracker.repository.entities.TrackDto
 interface TrackDao {
 
     @Query("SELECT * FROM track")
-    fun fetchAll(): List<TrackDto>
+    fun fetchAll(): LiveData<List<TrackDto>>
 
     @Insert
-    fun add(trackDto: TrackDto)
+    fun add(trackDto: TrackDto): Long
 
     @Delete
     fun delete(trackDto: TrackDto)
