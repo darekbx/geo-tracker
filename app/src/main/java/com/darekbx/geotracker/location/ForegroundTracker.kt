@@ -1,16 +1,22 @@
 package com.darekbx.geotracker.location
 
 import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import com.darekbx.geotracker.GeoTrackerApplication
-import com.darekbx.geotracker.repository.AppDatabase
+import com.darekbx.geotracker.R
 import com.darekbx.geotracker.repository.PointDao
+import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.utils.AppPreferences
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,10 +31,9 @@ import javax.inject.Inject
 class ForegroundTracker : Service() {
 
     companion object {
-        val DEFAULT_UPDATES_INTERVAL = TimeUnit.SECONDS.toMillis(15)
-        val DEFAULT_MIN_DISTANCE = 10F
-
         val TRACK_ID_KEY = "track_id_key"
+        val NOTIFICATION_ID = 100
+        val NOTIFICATION_CHANNEL_ID = "location_channel_id"
     }
 
     private val viewModelJob = SupervisorJob()
@@ -41,9 +46,23 @@ class ForegroundTracker : Service() {
     @Inject
     lateinit var pointDao: PointDao
 
+    @Inject
+    lateinit var trackDao: TrackDao
+
     private var trackId: Long? = null
+    private var lastLocation: Location? = null
 
     override fun onBind(p0: Intent?) = null
+
+    override fun onCreate() {
+        super.onCreate()
+
+        val notification = showNotification(
+            getString(R.string.app_name),
+            getString(R.string.notification_text)
+        )
+        startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -88,9 +107,19 @@ class ForegroundTracker : Service() {
             Log.v(GeoTrackerApplication.LOG_TAG, "Received location update: $location")
 
             ioScope.launch {
-                trackId?.let { trackId -> addPoint(trackId, location) }
+                trackId?.let { trackId ->
+                    addPoint(trackId, location)
+                    appendDistance(location, trackId)
+                }
             }
         }
+    }
+
+    private fun appendDistance(location: Location, trackId: Long) {
+        lastLocation?.distanceTo(location)?.let { distance ->
+            trackDao.appendDistance(trackId, distance)
+        }
+        lastLocation = location
     }
 
     private fun addPoint(trackId: Long, location: Location) {
@@ -106,6 +135,33 @@ class ForegroundTracker : Service() {
             )
             pointDao.add(point)
         }
+    }
+
+    private fun showNotification(title: String, text: String): Notification {
+        val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_menu_myplaces)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setDefaults(NotificationCompat.DEFAULT_SOUND or NotificationCompat.DEFAULT_VIBRATE)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setAutoCancel(true)
+
+        val notificationManager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        var channel = notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID)
+        if (channel == null) {
+            channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                title,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        return builder.build()
     }
 
     private val locationManager by lazy { getSystemService(Context.LOCATION_SERVICE) as LocationManager }

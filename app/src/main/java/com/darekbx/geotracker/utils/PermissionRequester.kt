@@ -5,25 +5,23 @@ import androidx.fragment.app.FragmentActivity
 
 class PermissionRequester(
     val activity: FragmentActivity?,
-    val permission: String,
-    val onDenied: () -> Unit = { },
-    val onRationale: () -> Unit = { }
+    val permissions: Array<String>,
+    val onDenied: () -> Unit = { }
 ) {
 
     private var onGranted: () -> Unit = { }
 
     private val requestPermissionLauncher =
-        activity?.registerForActivityResult(ActivityResultContracts.RequestPermission())
-        { isGranted ->
+        activity?.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
+        { permissions ->
             when {
-                isGranted -> onGranted()
-                activity?.shouldShowRequestPermissionRationale(permission) -> onRationale()
+                permissions.all { it.value } -> onGranted()
                 else -> onDenied()
             }
         }
 
     fun runWithPermission(onGranted: () -> Unit) {
         this.onGranted = onGranted
-        requestPermissionLauncher?.launch(permission)
+        requestPermissionLauncher?.launch(permissions)
     }
 }

@@ -10,6 +10,8 @@ import com.darekbx.geotracker.model.Track
 class TrackAdapter(val context: Context?)
     : RecyclerView.Adapter<TrackAdapter.ViewHolder>() {
 
+    var onTrackClick: ((Track) -> Unit)? = null
+
     var items = listOf<Track>()
         set(value) {
             field = value
@@ -18,7 +20,7 @@ class TrackAdapter(val context: Context?)
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): ViewHolder {
         val binding = AdapterTrackBinding.inflate(inflater, parent, false)
-        return ViewHolder(binding)
+        return ViewHolder(binding, onTrackClick)
     }
 
     override fun getItemCount(): Int {
@@ -32,11 +34,17 @@ class TrackAdapter(val context: Context?)
 
     val inflater by lazy { LayoutInflater.from(context) }
 
-    class ViewHolder(val binding: AdapterTrackBinding) :
+    class ViewHolder(val binding: AdapterTrackBinding, val onTrackClick: ((Track) -> Unit)?) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(track: Track) {
             binding.track = track
+            binding.rowContainer.setOnClickListener {
+                onTrackClick?.run { this(track) }
+            }
+            binding.rowContainer.setOnLongClickListener {
+
+            }
             binding.executePendingBindings()
         }
     }

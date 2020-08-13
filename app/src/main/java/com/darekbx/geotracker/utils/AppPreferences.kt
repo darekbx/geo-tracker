@@ -2,7 +2,7 @@ package com.darekbx.geotracker.utils
 
 import android.content.Context
 import com.darekbx.geotracker.GeoTrackerApplication
-import com.darekbx.geotracker.location.ForegroundTracker
+import com.darekbx.geotracker.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -14,13 +14,19 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
     }
 
     var gpsUpdateInterval: Long
-        get() = preferences.getLong(GPS_UPDATE_INTERVAL_KEY, ForegroundTracker.DEFAULT_UPDATES_INTERVAL)
+        get() {
+            val defaultValue = context.resources.getInteger(R.integer.default_gps_interval)
+            return preferences.getLong(GPS_UPDATE_INTERVAL_KEY, defaultValue.toLong())
+        }
         set(value) {
             preferences.edit().putLong(GPS_UPDATE_INTERVAL_KEY, value).apply()
         }
 
     var gpsMinDistance: Float
-        get() = preferences.getFloat(GPS_MIN_DISTANCE_KEY, ForegroundTracker.DEFAULT_MIN_DISTANCE)
+        get() {
+            val defaultValue = context.resources.getInteger(R.integer.default_gps_distance)
+            return preferences.getFloat(GPS_MIN_DISTANCE_KEY, defaultValue.toFloat())
+        }
         set(value) {
             preferences.edit().putFloat(GPS_MIN_DISTANCE_KEY, value).apply()
         }

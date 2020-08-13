@@ -1,18 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/value_label"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:ellipsize="end"
+        android:padding="@dimen/padding_medium"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        tools:text="Label"
+        />
+
+    <Space
+        android:id="@+id/guide_line"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/value_label"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="TRACK"
-        android:textSize="28sp"
+        android:layout_marginEnd="40dp"
+        />
+
+    <TextView
+        android:id="@+id/label_start_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/value_label"
+        android:paddingStart="@dimen/padding_medium"
+        />
+    <TextView
+        android:id="@+id/value_start_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="2020-05-25 13:00:00"
+        app:layout_constraintStart_toEndOf="@id/guide_line"
+        app:layout_constraintTop_toBottomOf="@id/value_label"
+        android:paddingEnd="@dimen/padding_medium"
+        android:textColor="@android:color/black"
+        />
+
+    <TextView
+        android:id="@+id/label_end_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="End time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_start_time"
+        android:paddingStart="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_small"
+        />
+    <TextView
+        android:id="@+id/value_end_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="2020-05-25 13:00:00"
+        app:layout_constraintStart_toEndOf="@id/guide_line"
+        app:layout_constraintTop_toBottomOf="@id/label_start_time"
+        android:paddingEnd="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_small"
+        android:textColor="@android:color/black"
+        />
+
+    <TextView
+        android:id="@+id/label_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Distance"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_end_time"
+        android:paddingStart="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_small"
+        />
+    <TextView
+        android:id="@+id/value_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="15.43km"
+        app:layout_constraintStart_toEndOf="@id/guide_line"
+        app:layout_constraintTop_toBottomOf="@id/label_end_time"
+        android:paddingEnd="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_small"
+        android:textColor="@android:color/black"
+        />
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/value_distance"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/padding_medium"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
