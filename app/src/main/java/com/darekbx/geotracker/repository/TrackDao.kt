@@ -13,8 +13,8 @@ interface TrackDao {
     @Query("SELECT * FROM track WHERE id = :trackId")
     fun fetch(trackId: Long): TrackDto
 
-    @Query("UPDATE track SET label = :label, end_timestamp = :endTimestamp, distance = :distance WHERE id = :trackId")
-    fun update(trackId: Long, label: String?, endTimestamp: Long, distance: Float)
+    @Query("UPDATE track SET label = :label, end_timestamp = :endTimestamp WHERE id = :trackId")
+    fun update(trackId: Long, label: String?, endTimestamp: Long)
 
     @Query("UPDATE track SET distance = distance + :distance WHERE id = :trackId")
     fun appendDistance(trackId: Long, distance: Float)
@@ -22,6 +22,6 @@ interface TrackDao {
     @Insert
     fun add(trackDto: TrackDto): Long
 
-    @Delete
-    fun delete(trackDto: TrackDto)
+    @Query("DELETE FROM track WHERE id = :trackId")
+    fun delete(trackId: Long)
 }

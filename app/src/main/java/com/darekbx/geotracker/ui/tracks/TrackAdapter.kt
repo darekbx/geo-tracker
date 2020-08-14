@@ -11,6 +11,7 @@ class TrackAdapter(val context: Context?)
     : RecyclerView.Adapter<TrackAdapter.ViewHolder>() {
 
     var onTrackClick: ((Track) -> Unit)? = null
+    var onTrackLongClick: ((Track) -> Unit)? = null
 
     var items = listOf<Track>()
         set(value) {
@@ -20,7 +21,7 @@ class TrackAdapter(val context: Context?)
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): ViewHolder {
         val binding = AdapterTrackBinding.inflate(inflater, parent, false)
-        return ViewHolder(binding, onTrackClick)
+        return ViewHolder(binding, onTrackClick, onTrackLongClick)
     }
 
     override fun getItemCount(): Int {
@@ -34,7 +35,11 @@ class TrackAdapter(val context: Context?)
 
     val inflater by lazy { LayoutInflater.from(context) }
 
-    class ViewHolder(val binding: AdapterTrackBinding, val onTrackClick: ((Track) -> Unit)?) :
+    class ViewHolder(
+        val binding: AdapterTrackBinding,
+        val onTrackClick: ((Track) -> Unit)?,
+        val onTrackLongClick: ((Track) -> Unit)?
+    ) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(track: Track) {
@@ -43,7 +48,8 @@ class TrackAdapter(val context: Context?)
                 onTrackClick?.run { this(track) }
             }
             binding.rowContainer.setOnLongClickListener {
-
+                onTrackLongClick?.run { this(track) }
+                true
             }
             binding.executePendingBindings()
         }

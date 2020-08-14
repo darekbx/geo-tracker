@@ -2,10 +2,12 @@ package com.darekbx.geotracker.ui.tracks
 
 import android.Manifest
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -71,11 +73,13 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         })
 
         tracksViewModel.newTrackid.observe(viewLifecycleOwner, Observer { trackId ->
-            startTracking(trackId)
-            tracksViewModel.subscribeToPoints(trackId)
-            currentTrackId = trackId
+            if (status_container.isVisible) {
+                startTracking(trackId)
+                tracksViewModel.subscribeToPoints(trackId)
+                currentTrackId = trackId
 
-            observePointsChanges()
+                observePointsChanges()
+            }
         })
 
         tracksViewModel.updateResult.observe(viewLifecycleOwner, Observer {
@@ -86,8 +90,8 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun handleStopRecordActions() {
         button_record.setOnClickListener {
             fineLocation.runWithPermission {
-                tracksViewModel.createNewTrack()
                 setUIMode(isRecording = true)
+                tracksViewModel.createNewTrack()
             }
         }
 
@@ -100,7 +104,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun saveTrack(label: String?) {
         currentTrackId?.let { currentTrackId ->
-            tracksViewModel.updateTrack(currentTrackId, label, 0.0F)
+            tracksViewModel.updateTrack(currentTrackId, label)
         }
     }
 
@@ -158,6 +162,22 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
             .navigate(R.id.action_tracksFragment_to_trackFragment, arguments)
     }
 
+    private fun deleteTrackConfirmation(track: Track) {
+        context?.let { context ->
+            AlertDialog.Builder(context)
+                .setMessage(getString(R.string.delete_message, track.label))
+                .setNegativeButton(R.string.delete_no, null)
+                .setPositiveButton(R.string.delete_yes, object: DialogInterface.OnClickListener{
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        track.id?.let { trackId ->
+                            tracksViewModel.deleteTrack(trackId)
+                        }
+                    }
+                })
+                .show()
+        }
+    }
+
     private fun setUIMode(isRecording: Boolean) {
         when {
             isRecording -> {
@@ -193,6 +213,9 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 track.id?.let { trackId ->
                     openTrack(trackId)
                 }
+            }
+            onTrackLongClick = { track ->
+                deleteTrackConfirmation(track)
             }
         }
     }

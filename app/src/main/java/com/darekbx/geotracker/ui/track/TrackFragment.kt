@@ -18,6 +18,8 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 
 
@@ -81,7 +83,6 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
                 setCenter(startPoint)
             }
         }
-
 
         val polyline = Polyline().apply {
             outlinePaint.setColor(Color.RED)

@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import com.darekbx.geotracker.location.ForegroundTracker
 import com.darekbx.geotracker.model.RecordStatus
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.PointDao
@@ -32,6 +33,13 @@ class TrackViewModel @ViewModelInject constructor(
 
     val newTrackid = MutableLiveData<Long>()
 
+    fun deleteTrack(trackId: Long) {
+        ioScope.launch {
+            trackDao.delete(trackId)
+            pointDao.deleteByTrack(trackId)
+        }
+    }
+
     fun fetchTrack(trackId: Long) =
         MutableLiveData<Track>().apply {
             ioScope.launch {
@@ -49,15 +57,15 @@ class TrackViewModel @ViewModelInject constructor(
                 MutableLiveData<RecordStatus>().apply {
                     ioScope.launch {
                         val track = trackDao.fetch(trackId)
-                        postValue(RecordStatus(points.size, track.distance ?: 0.0F))
+                        postValue(RecordStatus(points.size, (track.distance ?: 0.0F) / ONE_KILOMETER))
                     }
                 }
             })
     }
 
-    fun updateTrack(trackId: Long, label: String?, distance: Float) {
+    fun updateTrack(trackId: Long, label: String?) {
         ioScope.launch {
-            trackDao.update(trackId, label, System.currentTimeMillis(), distance)
+            trackDao.update(trackId, label, System.currentTimeMillis())
             updateResult.postValue(true)
         }
     }

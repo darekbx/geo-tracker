@@ -16,6 +16,10 @@
     <string name="location_is_not_enabled">Location is not enabled, please enable to start recording.</string>
     <string name="permissions_are_required">Location permissions are required to track your location.</string>
 
+    <string name="delete_message">Delete track \"%s\"</string>
+    <string name="delete_yes">Yes</string>
+    <string name="delete_no">No</string>
+
     <string name="settings_gps_category">GPS Settings</string>
     <string name="settings_interval_dialog_title">Minimum interval</string>
     <string name="settings_interval_summary">Set interval in seconds</string>
