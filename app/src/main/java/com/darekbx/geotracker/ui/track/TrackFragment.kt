@@ -75,6 +75,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         value_start_time.setText(track.startTimestamp)
         value_end_time.setText(track.endTimestamp ?: getString(R.string.empty))
         value_distance.setText(getString(R.string.distance_format, track.distance))
+        speed_view.values = track.points.map { it.speed }
 
         track.points.firstOrNull()?.let { point ->
             map.controller.apply {
