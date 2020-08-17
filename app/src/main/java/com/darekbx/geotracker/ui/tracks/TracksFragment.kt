@@ -1,9 +1,7 @@
 package com.darekbx.geotracker.ui.tracks
 
 import android.Manifest
-import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -27,12 +25,25 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
+    companion object {
+        val STOP_ACTION = "stop_action"
+    }
+
     @Inject
     lateinit var appPreferences: AppPreferences
 
     private val tracksViewModel: TrackViewModel by viewModels()
 
     private var currentTrackId: Long? = null
+
+
+    private val stopBroadcast = object: BroadcastReceiver() {
+        override fun onReceive(context: Context?, data: Intent?) {
+            data?.takeIf { it.action == STOP_ACTION }?.let {
+                stopTracking()
+            }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -42,11 +53,21 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
         tracks_list.adapter = trackAdapter
         tracks_list.layoutManager = LinearLayoutManager(context)
+
+        activity?.registerReceiver(stopBroadcast, IntentFilter(STOP_ACTION))
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         stopTrackingService()
+
+        try {
+            stopBroadcast?.let {
+                activity?.unregisterReceiver(stopBroadcast)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onResume() {
@@ -133,11 +154,17 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun stopTracking() {
         stopTrackingService()
-        SaveTrackDialog().apply {
-            saveCallback = { label ->
-                saveTrack(label)
+
+        when (isStateSaved) {
+            true -> saveTrack("Unknown")
+            else -> {
+                SaveTrackDialog().apply {
+                    saveCallback = { label ->
+                        saveTrack(label)
+                    }
+                }.show(parentFragmentManager, SaveTrackDialog::class.java.simpleName)
             }
-        }.show(parentFragmentManager, SaveTrackDialog::class.java.simpleName)
+        }
     }
 
     private fun stopTrackingService() {

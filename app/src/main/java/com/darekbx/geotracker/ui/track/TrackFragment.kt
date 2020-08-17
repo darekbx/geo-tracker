@@ -18,8 +18,6 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
-import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 
 
@@ -36,24 +34,14 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.let { arguments ->
-            val trackId = arguments.getLong(TRACK_ID_KEY)
-            tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
-                displayTrack(track)
-            })
-        }
+        tracksViewModel.updateResult.observe(viewLifecycleOwner, Observer {
+            loadTrack()
+        })
 
+        loadTrack()
         initializeMap()
-    }
 
-    private fun initializeMap() {
-        val context = activity?.applicationContext
-        Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context))
-        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID)
-
-        map.setTileSource(TileSourceFactory.MAPNIK)
-        map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
-        map.setMultiTouchControls(true)
+        image_label_edit.setOnClickListener { editLabel() }
     }
 
     override fun onResume() {
@@ -66,6 +54,25 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         map.onPause()
     }
 
+    private fun loadTrack() {
+        arguments?.let { arguments ->
+            val trackId = arguments.getLong(TRACK_ID_KEY)
+            tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
+                displayTrack(track)
+            })
+        }
+    }
+
+    private fun initializeMap() {
+        val context = activity?.applicationContext
+        Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context))
+        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID)
+
+        map.setTileSource(TileSourceFactory.MAPNIK)
+        map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
+        map.setMultiTouchControls(true)
+    }
+
     private fun displayTrack(track: Track) {
         val label = when (TextUtils.isEmpty(track.label)) {
             true -> getString(R.string.empty)
@@ -75,6 +82,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         value_start_time.setText(track.startTimestamp)
         value_end_time.setText(track.endTimestamp ?: getString(R.string.empty))
         value_distance.setText(getString(R.string.distance_format, track.distance))
+        value_points.setText("${track.points.size}")
         speed_view.values = track.points.map { it.speed }
 
         track.points.firstOrNull()?.let { point ->
@@ -94,5 +102,18 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
 
         val mapPoints = track.points.map { point -> GeoPoint(point.latitude, point.longitude) }
         polyline.setPoints(mapPoints)
+    }
+
+    private fun editLabel() {
+        val currentLabel = value_label.text.toString()
+        val trackId = arguments?.getLong(TRACK_ID_KEY)
+        SaveTrackDialog().apply {
+            initialLabel = currentLabel
+            saveCallback = { label ->
+                trackId?.let { trackId ->
+                    tracksViewModel.updateTrack(trackId, label)
+                }
+            }
+        }.show(parentFragmentManager, SaveTrackDialog::class.java.simpleName)
     }
 }
