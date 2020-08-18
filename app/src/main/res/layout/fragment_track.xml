@@ -45,7 +45,7 @@
         android:id="@+id/label_start_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start time"
+        android:text="@string/start_format"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/value_label"
         android:paddingStart="@dimen/padding_medium"
@@ -65,7 +65,7 @@
         android:id="@+id/label_end_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="End time"
+        android:text="@string/end_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_start_time"
         android:paddingStart="@dimen/padding_medium"
@@ -84,12 +84,34 @@
         />
 
     <TextView
+        android:id="@+id/label_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_end_time"
+        android:paddingStart="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_small"
+        />
+    <TextView
+        android:id="@+id/value_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="1h 20m"
+        app:layout_constraintStart_toEndOf="@id/guide_line"
+        app:layout_constraintTop_toBottomOf="@id/label_end_time"
+        android:paddingEnd="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_small"
+        android:textColor="@android:color/black"
+        />
+
+    <TextView
         android:id="@+id/label_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Distance"
+        android:text="@string/distance"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_end_time"
+        app:layout_constraintTop_toBottomOf="@id/label_time"
         android:paddingStart="@dimen/padding_medium"
         android:paddingTop="@dimen/padding_small"
         />
@@ -99,7 +121,7 @@
         android:layout_height="wrap_content"
         tools:text="15.43km"
         app:layout_constraintStart_toEndOf="@id/guide_line"
-        app:layout_constraintTop_toBottomOf="@id/label_end_time"
+        app:layout_constraintTop_toBottomOf="@id/label_time"
         android:paddingEnd="@dimen/padding_medium"
         android:paddingTop="@dimen/padding_small"
         android:textColor="@android:color/black"
@@ -109,7 +131,7 @@
         android:id="@+id/label_points"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Points"
+        android:text="@string/points"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_distance"
         android:paddingStart="@dimen/padding_medium"

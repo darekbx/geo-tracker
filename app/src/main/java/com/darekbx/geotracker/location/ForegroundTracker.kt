@@ -17,12 +17,12 @@ import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.ui.tracks.TracksFragment
 import com.darekbx.geotracker.utils.AppPreferences
+import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,6 +30,7 @@ class ForegroundTracker : Service() {
 
     companion object {
         val TRACK_ID_KEY = "track_id_key"
+        val MIN_DISTANCE_TO_NOTIFY = 250 // [m]
         val NOTIFICATION_ID = 100
         val NOTIFICATION_CHANNEL_ID = "location_channel_id"
     }
@@ -48,6 +49,8 @@ class ForegroundTracker : Service() {
     lateinit var trackDao: TrackDao
 
     private var trackId: Long? = null
+    private var sessionDistance = 0.0F
+    private var lastSessionDistance = 0.0F
     private var lastLocation: Location? = null
 
     override fun onBind(p0: Intent?) = null
@@ -55,7 +58,7 @@ class ForegroundTracker : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        val notification = showNotification(
+        val notification = createNotification(
             getString(R.string.app_name),
             getString(R.string.notification_text)
         )
@@ -90,6 +93,7 @@ class ForegroundTracker : Service() {
     @SuppressLint("MissingPermission")
     private fun startLocationUpdates() {
         Log.v(GeoTrackerApplication.LOG_TAG, "Start location updates")
+        sessionDistance = 0.0F
         val minDistance = appPreferences.gpsMinDistance
         val updateInterval = appPreferences.gpsUpdateInterval
         locationManager.requestLocationUpdates(
@@ -116,6 +120,9 @@ class ForegroundTracker : Service() {
     private fun appendDistance(location: Location, trackId: Long) {
         lastLocation?.distanceTo(location)?.let { distance ->
             trackDao.appendDistance(trackId, distance)
+            sessionDistance += distance
+            updateNotification()
+            lastSessionDistance = sessionDistance
         }
         lastLocation = location
     }
@@ -135,7 +142,17 @@ class ForegroundTracker : Service() {
         }
     }
 
-    private fun showNotification(title: String, text: String): Notification {
+    private fun updateNotification() {
+        if (sessionDistance - lastSessionDistance > MIN_DISTANCE_TO_NOTIFY) {
+            val notification = createNotification(
+                getString(R.string.notification_title, sessionDistance / TrackViewModel.ONE_KILOMETER),
+                getString(R.string.notification_text)
+            )
+            notificationManager.notify(NOTIFICATION_ID, notification)
+        }
+    }
+
+    private fun createNotification(title: String, text: String): Notification {
 
         val stopIntent = Intent(TracksFragment.STOP_ACTION)
         val stopPendingIntent = PendingIntent.getBroadcast(applicationContext, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -145,11 +162,9 @@ class ForegroundTracker : Service() {
             .setContentTitle(title)
             .setContentText(text)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-            .setDefaults(NotificationCompat.DEFAULT_SOUND or NotificationCompat.DEFAULT_VIBRATE)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .addAction(R.drawable.ic_stop, getString(R.string.button_stop), stopPendingIntent)
-            .setAutoCancel(true)
 
         val notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -159,7 +174,7 @@ class ForegroundTracker : Service() {
             channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
                 title,
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_LOW
             )
             notificationManager.createNotificationChannel(channel)
         }
@@ -168,4 +183,5 @@ class ForegroundTracker : Service() {
     }
 
     private val locationManager by lazy { getSystemService(Context.LOCATION_SERVICE) as LocationManager }
+    private val notificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
 }

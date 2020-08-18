@@ -4,7 +4,6 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.darekbx.geotracker.location.ForegroundTracker
 import com.darekbx.geotracker.model.RecordStatus
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.PointDao
@@ -43,10 +42,11 @@ class TrackViewModel @ViewModelInject constructor(
     fun fetchTrack(trackId: Long) =
         MutableLiveData<Track>().apply {
             ioScope.launch {
-                val trackDto = trackDao.fetch(trackId)
-                val track = mapTrackDtoToTrack(trackDto)
-                track.points = pointDao.fetchByTrackAsync(trackId)
-                postValue(track)
+                trackDao.fetch(trackId)?.let { trackDto ->
+                    val track = mapTrackDtoToTrack(trackDto)
+                    track.points = pointDao.fetchByTrackAsync(trackId)
+                    postValue(track)
+                }
             }
         }
 
@@ -57,7 +57,7 @@ class TrackViewModel @ViewModelInject constructor(
                 MutableLiveData<RecordStatus>().apply {
                     ioScope.launch {
                         val track = trackDao.fetch(trackId)
-                        postValue(RecordStatus(points.size, (track.distance ?: 0.0F) / ONE_KILOMETER))
+                        postValue(RecordStatus(points.size, (track?.distance ?: 0.0F) / ONE_KILOMETER))
                     }
                 }
             })
@@ -82,12 +82,27 @@ class TrackViewModel @ViewModelInject constructor(
     }
 
     private fun mapTrackDtoToTrack(trackDto: TrackDto): Track {
+        var difference = ""
+        if (trackDto.endTimestamp != null) {
+            difference = getFormattedTimeDiff(trackDto.startTimestamp, trackDto.endTimestamp)
+        }
         return Track(
             trackDto.id,
             trackDto.label ?: "",
             DateTimeUtils.format(trackDto.startTimestamp),
             DateTimeUtils.format(trackDto.endTimestamp),
+            difference,
             (trackDto.distance ?: 0.0F) / ONE_KILOMETER
         )
+    }
+
+    private fun getFormattedTimeDiff(start: Long, end: Long): String {
+        var time = (end - start) / 1000
+        val hours = time / 3600
+        time %= 3600
+        val minutes = time / 60
+        time %= 60
+        val seconds = time
+        return "${hours}h ${minutes}m ${seconds}s"
     }
 }

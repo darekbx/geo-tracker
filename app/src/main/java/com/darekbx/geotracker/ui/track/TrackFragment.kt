@@ -81,6 +81,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         value_label.setText(label)
         value_start_time.setText(track.startTimestamp)
         value_end_time.setText(track.endTimestamp ?: getString(R.string.empty))
+        value_time.setText(track.timeDifference)
         value_distance.setText(getString(R.string.distance_format, track.distance))
         value_points.setText("${track.points.size}")
         speed_view.values = track.points.map { it.speed }

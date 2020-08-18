@@ -7,6 +7,7 @@ class Track(
     val label: String,
     val startTimestamp: String?,
     val endTimestamp: String?,
+    val timeDifference: String?,
     val distance: Float,
     var points: List<PointDto> = emptyList()
 )

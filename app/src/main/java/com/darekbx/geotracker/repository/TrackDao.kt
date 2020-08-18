@@ -11,7 +11,7 @@ interface TrackDao {
     fun fetchAll(): LiveData<List<TrackDto>>
 
     @Query("SELECT * FROM track WHERE id = :trackId")
-    fun fetch(trackId: Long): TrackDto
+    fun fetch(trackId: Long): TrackDto?
 
     @Query("UPDATE track SET label = :label, end_timestamp = :endTimestamp WHERE id = :trackId")
     fun update(trackId: Long, label: String?, endTimestamp: Long)
