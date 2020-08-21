@@ -34,4 +34,6 @@
     <string name="settings_distance_dialog_title">Minimum distance</string>
     <string name="settings_distance_summary">Set distance in meters</string>
     <string name="settings_distance">Locaton refresh min distance [m]</string>
+    <string name="settings_notification_distance">Notification min distance [m]</string>
+    <string name="settings_notification_distance_title">Set distance in meters</string>
 </resources>

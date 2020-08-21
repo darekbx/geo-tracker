@@ -30,7 +30,6 @@ class ForegroundTracker : Service() {
 
     companion object {
         val TRACK_ID_KEY = "track_id_key"
-        val MIN_DISTANCE_TO_NOTIFY = 250 // [m]
         val NOTIFICATION_ID = 100
         val NOTIFICATION_CHANNEL_ID = "location_channel_id"
     }
@@ -122,7 +121,6 @@ class ForegroundTracker : Service() {
             trackDao.appendDistance(trackId, distance)
             sessionDistance += distance
             updateNotification()
-            lastSessionDistance = sessionDistance
         }
         lastLocation = location
     }
@@ -143,12 +141,13 @@ class ForegroundTracker : Service() {
     }
 
     private fun updateNotification() {
-        if (sessionDistance - lastSessionDistance > MIN_DISTANCE_TO_NOTIFY) {
+        if (sessionDistance - lastSessionDistance > appPreferences.gpsNotificationMinDistance) {
             val notification = createNotification(
                 getString(R.string.notification_title, sessionDistance / TrackViewModel.ONE_KILOMETER),
                 getString(R.string.notification_text)
             )
             notificationManager.notify(NOTIFICATION_ID, notification)
+            lastSessionDistance = sessionDistance
         }
     }
 

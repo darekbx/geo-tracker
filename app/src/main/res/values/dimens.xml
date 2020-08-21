@@ -6,5 +6,6 @@
 
     <integer name="default_gps_interval">10</integer>
     <integer name="default_gps_distance">2</integer>
+    <integer name="default_min_notification_distance">250</integer>
 
 </resources>

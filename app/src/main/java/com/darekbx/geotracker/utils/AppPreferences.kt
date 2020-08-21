@@ -11,6 +11,7 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
     companion object {
         private val GPS_UPDATE_INTERVAL_KEY = "gps_update_interval_key"
         private val GPS_MIN_DISTANCE_KEY = "gps_min_distance_key"
+        private val NOTIFICATION_MIN_DISTANCE_KEY = "notification_min_distance"
     }
 
     var gpsUpdateInterval: Long
@@ -29,6 +30,15 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
         }
         set(value) {
             preferences.edit().putFloat(GPS_MIN_DISTANCE_KEY, value).apply()
+        }
+
+    var gpsNotificationMinDistance: Float
+        get() {
+            val defaultValue = context.resources.getInteger(R.integer.default_min_notification_distance)
+            return preferences.getFloat(NOTIFICATION_MIN_DISTANCE_KEY, defaultValue.toFloat())
+        }
+        set(value) {
+            preferences.edit().putFloat(NOTIFICATION_MIN_DISTANCE_KEY, value).apply()
         }
 
     private val preferences by lazy {

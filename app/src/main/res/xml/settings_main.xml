@@ -19,5 +19,12 @@
             android:defaultValue="@integer/default_gps_distance"
             app:useSimpleSummaryProvider="true"
             />
+        <EditTextPreference
+            android:key="notification_min_distance"
+            android:title="@string/settings_notification_distance"
+            android:dialogTitle="@string/settings_notification_distance_title"
+            android:defaultValue="@integer/default_min_notification_distance"
+            app:useSimpleSummaryProvider="true"
+            />
     </PreferenceCategory>
 </PreferenceScreen>
