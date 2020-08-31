@@ -7,7 +7,7 @@ import com.darekbx.geotracker.repository.entities.TrackDto
 @Dao
 interface TrackDao {
 
-    @Query("SELECT * FROM track")
+    @Query("SELECT * FROM track ORDER BY id DESC")
     fun fetchAll(): LiveData<List<TrackDto>>
 
     @Query("SELECT * FROM track WHERE id = :trackId")

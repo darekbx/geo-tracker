@@ -85,6 +85,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         value_distance.setText(getString(R.string.distance_format, track.distance))
         value_points.setText("${track.points.size}")
         speed_view.values = track.points.map { it.speed }
+        altitude_view.values = track.points.map { it.altitude.toFloat() }
 
         track.points.firstOrNull()?.let { point ->
             map.controller.apply {

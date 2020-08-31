@@ -23,6 +23,7 @@ class SaveTrackDialog : DialogFragment(R.layout.dialog_track_label) {
         val inset = InsetDrawable(back, 20)
         dialog.window?.setBackgroundDrawable(inset)
         dialog.setCancelable(false)
+        isCancelable = false
 
         return dialog
     }
