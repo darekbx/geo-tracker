@@ -83,5 +83,14 @@
         android:src="@drawable/ic_stop"
         android:visibility="gone"
         />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_all_tracks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/button_record"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="@dimen/padding_large"
+        android:src="@drawable/ic_all"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

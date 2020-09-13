@@ -36,7 +36,6 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private var currentTrackId: Long? = null
 
-
     private val stopBroadcast = object: BroadcastReceiver() {
         override fun onReceive(context: Context?, data: Intent?) {
             data?.takeIf { it.action == STOP_ACTION }?.let {
@@ -50,6 +49,11 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
         registerViewModel()
         handleStopRecordActions()
+
+        button_all_tracks.setOnClickListener {
+            findNavController()
+                .navigate(R.id.action_tracksFragment_to_allTracksFragment)
+        }
 
         tracks_list.adapter = trackAdapter
         tracks_list.layoutManager = LinearLayoutManager(context)

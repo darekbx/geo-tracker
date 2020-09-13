@@ -11,6 +11,7 @@ import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.geotracker.utils.DateTimeUtils
 import kotlinx.coroutines.launch
+import java.lang.IllegalStateException
 
 class TrackViewModel @ViewModelInject constructor(
     private val trackDao: TrackDao,
@@ -23,6 +24,7 @@ class TrackViewModel @ViewModelInject constructor(
 
     var recordStatus: LiveData<RecordStatus>? = null
     var updateResult = MutableLiveData<Boolean>()
+    var allTracks = MutableLiveData<List<Track>>()
 
     val tracks = Transformations.map(trackDao.fetchAll(), { source ->
         source.map {
@@ -38,6 +40,24 @@ class TrackViewModel @ViewModelInject constructor(
             pointDao.deleteByTrack(trackId)
         }
     }
+
+    fun fetchAllTracks() {
+        ioScope.launch {
+            val tracksWithPoints =
+                trackDao
+                    .fetchAllAsync()
+                    .map { track ->
+                        val trackPoints = pointDao.fetchByTrackAsync(
+                            track.id ?: throw IllegalStateException("Empty id")
+                        )
+                        mapTrackDtoToTrack(track).apply {
+                            points = trackPoints
+                        }
+                    }
+            allTracks.postValue(tracksWithPoints)
+        }
+    }
+
 
     fun fetchTrack(trackId: Long) =
         MutableLiveData<Track>().apply {

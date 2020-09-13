@@ -10,6 +10,9 @@ interface TrackDao {
     @Query("SELECT * FROM track ORDER BY id DESC")
     fun fetchAll(): LiveData<List<TrackDto>>
 
+    @Query("SELECT * FROM track ORDER BY id DESC")
+    fun fetchAllAsync(): List<TrackDto>
+
     @Query("SELECT * FROM track WHERE id = :trackId")
     fun fetch(trackId: Long): TrackDto?
 

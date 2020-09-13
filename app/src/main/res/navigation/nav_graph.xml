@@ -33,5 +33,12 @@
         <action
             android:id="@+id/action_tracksFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_tracksFragment_to_allTracksFragment"
+            app:destination="@id/allTracksFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/allTracksFragment"
+        android:name="com.darekbx.geotracker.ui.tracks.AllTracksFragment"
+        android:label="AllTracksFragment" />
 </navigation>
