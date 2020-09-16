@@ -4,12 +4,15 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.model.RecordStatus
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.PointDao
 import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.geotracker.utils.DateTimeUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
 
@@ -25,12 +28,22 @@ class TrackViewModel @ViewModelInject constructor(
     var recordStatus: LiveData<RecordStatus>? = null
     var updateResult = MutableLiveData<Boolean>()
     var allTracks = MutableLiveData<List<Track>>()
+    var tracks = MutableLiveData<List<Track>>()
 
-    val tracks = Transformations.map(trackDao.fetchAll(), { source ->
-        source.map {
-            mapTrackDtoToTrack(it)
+    fun fetchTracks() {
+        viewModelScope.launch {
+            tracks.postValue(tracksFlow().toList())
         }
-    })
+    }
+
+    private fun tracksFlow() : Flow<Track> {
+        return flow {
+            trackDao.fetchAll().forEach { trackDto ->
+                val track = mapTrackDtoToTrack(trackDto)
+                emit(track)
+            }
+        }.flowOn(Dispatchers.IO)
+    }
 
     val newTrackid = MutableLiveData<Long>()
 
@@ -45,7 +58,7 @@ class TrackViewModel @ViewModelInject constructor(
         ioScope.launch {
             val tracksWithPoints =
                 trackDao
-                    .fetchAllAsync()
+                    .fetchAll()
                     .map { track ->
                         val trackPoints = pointDao.fetchByTrackAsync(
                             track.id ?: throw IllegalStateException("Empty id")
@@ -57,7 +70,6 @@ class TrackViewModel @ViewModelInject constructor(
             allTracks.postValue(tracksWithPoints)
         }
     }
-
 
     fun fetchTrack(trackId: Long) =
         MutableLiveData<Track>().apply {

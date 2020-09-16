@@ -62,6 +62,14 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.Placeholder
+        android:id="@+id/floating_placeholder"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="@dimen/padding_large"
+        />
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_record"
         android:layout_width="wrap_content"
@@ -87,7 +95,7 @@
         android:id="@+id/button_all_tracks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/button_record"
+        app:layout_constraintBottom_toTopOf="@id/floating_placeholder"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="@dimen/padding_large"
         android:src="@drawable/ic_all"

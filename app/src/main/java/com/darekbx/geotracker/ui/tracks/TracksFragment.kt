@@ -50,6 +50,8 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         registerViewModel()
         handleStopRecordActions()
 
+        tracksViewModel.fetchTracks()
+
         button_all_tracks.setOnClickListener {
             findNavController()
                 .navigate(R.id.action_tracksFragment_to_allTracksFragment)
@@ -130,6 +132,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun saveTrack(label: String?) {
         currentTrackId?.let { currentTrackId ->
             tracksViewModel.updateTrack(currentTrackId, label)
+            tracksViewModel.fetchTracks()
         }
     }
 
@@ -202,6 +205,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                     override fun onClick(dialog: DialogInterface?, which: Int) {
                         track.id?.let { trackId ->
                             tracksViewModel.deleteTrack(trackId)
+                            tracksViewModel.fetchTracks()
                         }
                     }
                 })

@@ -1,6 +1,5 @@
 package com.darekbx.geotracker.repository
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.darekbx.geotracker.repository.entities.TrackDto
 
@@ -8,10 +7,7 @@ import com.darekbx.geotracker.repository.entities.TrackDto
 interface TrackDao {
 
     @Query("SELECT * FROM track ORDER BY id DESC")
-    fun fetchAll(): LiveData<List<TrackDto>>
-
-    @Query("SELECT * FROM track ORDER BY id DESC")
-    fun fetchAllAsync(): List<TrackDto>
+    fun fetchAll(): List<TrackDto>
 
     @Query("SELECT * FROM track WHERE id = :trackId")
     fun fetch(trackId: Long): TrackDto?
