@@ -36,9 +36,7 @@ class SaveTrackDialog : DialogFragment(R.layout.dialog_track_label) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         save_button.setOnClickListener { validateLabelAndSave() }
-        initialLabel?.let {
-            input_label.setText(it)
-        }
+        input_label.setText(initialLabel ?: getString(R.string.default_track_name))
     }
 
     private fun validateLabelAndSave() {

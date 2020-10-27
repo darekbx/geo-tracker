@@ -15,6 +15,9 @@ interface TrackDao {
     @Query("UPDATE track SET label = :label, end_timestamp = :endTimestamp WHERE id = :trackId")
     fun update(trackId: Long, label: String?, endTimestamp: Long)
 
+    @Query("UPDATE track SET end_timestamp = :endTimestamp WHERE id = :trackId")
+    fun update(trackId: Long, endTimestamp: Long)
+
     @Query("UPDATE track SET distance = distance + :distance WHERE id = :trackId")
     fun appendDistance(trackId: Long, distance: Float)
 

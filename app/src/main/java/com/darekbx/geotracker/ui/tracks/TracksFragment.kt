@@ -2,6 +2,7 @@ package com.darekbx.geotracker.ui.tracks
 
 import android.Manifest
 import android.content.*
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -11,15 +12,21 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.room.Room
 import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.location.ForegroundTracker
 import com.darekbx.geotracker.model.Track
+import com.darekbx.geotracker.repository.AppDatabase
+import com.darekbx.geotracker.utils.DateTimeUtils
 import com.darekbx.geotracker.utils.LocationUtils
 import com.darekbx.geotracker.utils.PermissionRequester
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracks.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -46,6 +53,10 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        collapsing_toolbar.setCollapsedTitleTextColor(Color.WHITE)
+        collapsing_toolbar.setExpandedTitleColor(Color.WHITE)
+        toolbar.setTitle(R.string.app_name)
 
         registerViewModel()
         handleStopRecordActions()
@@ -97,6 +108,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun registerViewModel() {
         tracksViewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
             displayTracks(tracks)
+            displaySummary(tracks)
         })
 
         tracksViewModel.newTrackid.observe(viewLifecycleOwner, Observer { trackId ->
@@ -150,6 +162,23 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun displayTracks(tracks: List<Track>) {
         trackAdapter.items = tracks
+    }
+
+    private fun displaySummary(tracks: List<Track>) {
+        val count = tracks.size
+        val totalDistance = tracks.sumByDouble { it.distance.toDouble() }
+        val totalTime = tracks.sumBy {
+            it.timeDifference?.let { difference ->
+                val chunks = difference.split(" ")
+                val hours = chunks[0].removeSuffix("h").toIntOrNull() ?: 0
+                val minutes = chunks[1].removeSuffix("m").toIntOrNull() ?: 0
+                val seconds = chunks[2].removeSuffix("s").toIntOrNull() ?: 0
+                hours * 60 * 60 + minutes * 60 + seconds
+            } ?: 0
+        }
+        sum_count.setText("$count")
+        sum_distance.setText(getString(R.string.distance_format, totalDistance))
+        sum_time.setText("${DateTimeUtils.getFormattedTime(totalTime)}")
     }
 
     private fun startTracking(trackId: Long) {

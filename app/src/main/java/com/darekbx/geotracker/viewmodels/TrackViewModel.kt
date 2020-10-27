@@ -130,11 +130,6 @@ class TrackViewModel @ViewModelInject constructor(
 
     private fun getFormattedTimeDiff(start: Long, end: Long): String {
         var time = (end - start) / 1000
-        val hours = time / 3600
-        time %= 3600
-        val minutes = time / 60
-        time %= 60
-        val seconds = time
-        return "${hours}h ${minutes}m ${seconds}s"
+        return DateTimeUtils.getFormattedTime(time.toInt())
     }
 }

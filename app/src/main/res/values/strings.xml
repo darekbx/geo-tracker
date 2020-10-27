@@ -22,6 +22,10 @@
     <string name="time">Time</string>
     <string name="distance">Distance</string>
     <string name="points">Points</string>
+    <string name="default_track_name">Trasa</string>
+    <string name="total_distance">Total distance:</string>
+    <string name="total_time">Total time:</string>
+    <string name="total_count">Count:</string>
 
     <string name="delete_message">Delete track \"%s\"</string>
     <string name="delete_yes">Yes</string>

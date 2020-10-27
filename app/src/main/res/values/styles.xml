@@ -1,9 +1,17 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="summary_label">
+        <item name="android:textColor">#fff</item>
+    </style>
+    <style name="summary_value" parent="summary_label">
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginStart">@dimen/padding_small</item>
     </style>
 
 </resources>
