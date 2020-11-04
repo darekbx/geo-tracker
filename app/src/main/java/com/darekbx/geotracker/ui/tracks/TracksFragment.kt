@@ -4,7 +4,7 @@ import android.Manifest
 import android.content.*
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
+import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -12,21 +12,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.room.Room
 import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.location.ForegroundTracker
 import com.darekbx.geotracker.model.Track
-import com.darekbx.geotracker.repository.AppDatabase
 import com.darekbx.geotracker.utils.DateTimeUtils
 import com.darekbx.geotracker.utils.LocationUtils
 import com.darekbx.geotracker.utils.PermissionRequester
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracks.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -66,6 +61,11 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         button_all_tracks.setOnClickListener {
             findNavController()
                 .navigate(R.id.action_tracksFragment_to_allTracksFragment)
+        }
+
+        button_settings.setOnClickListener {
+            findNavController()
+                .navigate(R.id.action_tracksFragment_to_settingsFragment)
         }
 
         tracks_list.adapter = trackAdapter
@@ -154,7 +154,8 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 getString(
                     R.string.points_format,
                     recordStatus.pointsCount,
-                    recordStatus.distance
+                    recordStatus.distance,
+                    DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
                 )
             )
         })
@@ -168,7 +169,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         val count = tracks.size
         val totalDistance = tracks.sumByDouble { it.distance.toDouble() }
         val totalTime = tracks.sumBy {
-            it.timeDifference?.let { difference ->
+            it.timeDifference?.takeIf { it.isNotEmpty() }?.let { difference ->
                 val chunks = difference.split(" ")
                 val hours = chunks[0].removeSuffix("h").toIntOrNull() ?: 0
                 val minutes = chunks[1].removeSuffix("m").toIntOrNull() ?: 0

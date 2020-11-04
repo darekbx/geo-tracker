@@ -17,6 +17,7 @@ import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.ui.tracks.TracksFragment
 import com.darekbx.geotracker.utils.AppPreferences
+import com.darekbx.geotracker.utils.DateTimeUtils
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +50,7 @@ class ForegroundTracker : Service() {
 
     private var trackId: Long? = null
     private var sessionDistance = 0.0F
+    private var sessionStartTime = 0L
     private var lastSessionDistance = 0.0F
     private var lastLocation: Location? = null
 
@@ -93,6 +95,7 @@ class ForegroundTracker : Service() {
     private fun startLocationUpdates() {
         Log.v(GeoTrackerApplication.LOG_TAG, "Start location updates")
         sessionDistance = 0.0F
+        sessionStartTime = System.currentTimeMillis()
         val minDistance = appPreferences.gpsMinDistance
         val updateInterval = appPreferences.gpsUpdateInterval
         locationManager.requestLocationUpdates(
@@ -142,8 +145,13 @@ class ForegroundTracker : Service() {
 
     private fun updateNotification() {
         if (sessionDistance - lastSessionDistance > appPreferences.gpsNotificationMinDistance) {
+            val elapsedTimeInMs = ((System.currentTimeMillis() - sessionStartTime) / 1000).toInt()
             val notification = createNotification(
-                getString(R.string.notification_title, sessionDistance / TrackViewModel.ONE_KILOMETER),
+                getString(
+                    R.string.notification_title,
+                    sessionDistance / TrackViewModel.ONE_KILOMETER,
+                    DateTimeUtils.getFormattedTime(elapsedTimeInMs)
+                ),
                 getString(R.string.notification_text)
             )
             notificationManager.notify(NOTIFICATION_ID, notification)

@@ -89,7 +89,13 @@ class TrackViewModel @ViewModelInject constructor(
                 MutableLiveData<RecordStatus>().apply {
                     ioScope.launch {
                         val track = trackDao.fetch(trackId)
-                        postValue(RecordStatus(points.size, (track?.distance ?: 0.0F) / ONE_KILOMETER))
+                        postValue(
+                            RecordStatus(
+                                points.size,
+                                (track?.distance ?: 0.0F) / ONE_KILOMETER,
+                                (System.currentTimeMillis() - (track?.startTimestamp ?: 0L)) / 1000
+                            )
+                        )
                     }
                 }
             })
