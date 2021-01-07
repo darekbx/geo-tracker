@@ -46,10 +46,10 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
     }
 
     private fun loadAlTracks() {
-        tracksViewModel.allTracks.observe(viewLifecycleOwner, Observer { tracks ->
+        tracksViewModel.tracksWithPoints.observe(viewLifecycleOwner, Observer { tracks ->
             displayTracks(tracks)
         })
-        tracksViewModel.fetchAllTracks()
+        tracksViewModel.fetchTracksWithPoints()
     }
 
     private fun initializeMap() {

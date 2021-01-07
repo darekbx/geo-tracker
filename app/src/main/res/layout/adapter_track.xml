@@ -10,7 +10,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/row_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/padding_large"
+        android:background="#1666">
 
         <TextView
             android:id="@+id/track_label"
@@ -20,7 +22,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:paddingStart="@dimen/padding_medium"
-            android:paddingTop="@dimen/padding_medium"
             android:text="@{track.label}"
             android:textColor="@android:color/black"
             tools:text="Label"
@@ -33,7 +34,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/track_label"
             android:paddingStart="@dimen/padding_medium"
-            android:paddingTop="@dimen/padding_medium"
             android:text="@{@string/distance_format(track.distance)}"
             tools:text="10.56km"
             />
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:paddingTop="@dimen/padding_medium"
+            android:paddingTop="@dimen/padding_small"
             android:paddingEnd="@dimen/padding_medium"
             android:text="@{@string/start_format(track.startTimestamp)}"
             tools:text="Start: 2020-05-25 12:00"

@@ -12,8 +12,8 @@ interface PointDao {
     @Query("SELECT * FROM point WHERE track_id = :trackId")
     fun fetchByTrack(trackId: Long): LiveData<List<PointDto>>
 
-    @Query("SELECT * FROM point WHERE track_id = :trackId")
-    fun fetchByTrackAsync(trackId: Long): List<PointDto>
+    @Query("SELECT * FROM point WHERE track_id = :trackId AND ROWID % :nhtTwoToSkip == 0")
+    fun fetchByTrackAsync(trackId: Long, nhtTwoToSkip: Int): List<PointDto>
 
     @Query("DELETE FROM point WHERE track_id = :trackId")
     fun deleteByTrack(trackId: Long)

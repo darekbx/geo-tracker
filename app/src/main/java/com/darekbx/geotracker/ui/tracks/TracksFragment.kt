@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.location.ForegroundTracker
@@ -68,8 +67,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 .navigate(R.id.action_tracksFragment_to_settingsFragment)
         }
 
-        tracks_list.adapter = trackAdapter
-        tracks_list.layoutManager = LinearLayoutManager(context)
+        tracks_list.setAdapter(trackAdapter)
 
         activity?.registerReceiver(stopBroadcast, IntentFilter(STOP_ACTION))
     }
@@ -108,7 +106,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun registerViewModel() {
         tracksViewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
             displayTracks(tracks)
-            displaySummary(tracks)
+            displaySummary(tracks.flatMap { it.value })
         })
 
         tracksViewModel.newTrackid.observe(viewLifecycleOwner, Observer { trackId ->
@@ -155,14 +153,16 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                     R.string.points_format,
                     recordStatus.pointsCount,
                     recordStatus.distance,
+                    recordStatus.averageSpeed,
                     DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
                 )
             )
         })
     }
 
-    private fun displayTracks(tracks: List<Track>) {
+    private fun displayTracks(tracks: Map<String?, List<Track>>) {
         trackAdapter.items = tracks
+        tracks_list.expandGroup(0)
     }
 
     private fun displaySummary(tracks: List<Track>) {

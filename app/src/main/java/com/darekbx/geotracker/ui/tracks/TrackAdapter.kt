@@ -2,47 +2,78 @@ package com.darekbx.geotracker.ui.tracks
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import android.widget.BaseExpandableListAdapter
 import com.darekbx.geotracker.databinding.AdapterTrackBinding
+import com.darekbx.geotracker.databinding.AdapterYearSummaryBinding
 import com.darekbx.geotracker.model.Track
+import com.darekbx.geotracker.model.YearSummary
 
 class TrackAdapter(val context: Context?)
-    : RecyclerView.Adapter<TrackAdapter.ViewHolder>() {
+    : BaseExpandableListAdapter() {
 
     var onTrackClick: ((Track) -> Unit)? = null
     var onTrackLongClick: ((Track) -> Unit)? = null
 
-    var items = listOf<Track>()
+    var items = mapOf<String?, List<Track>>()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
-    override fun onCreateViewHolder(parent: ViewGroup, position: Int): ViewHolder {
+    override fun getGroupCount() = items.size
+
+    override fun getChildrenCount(groupPosition: Int): Int {
+        val key = items.keys.elementAt(groupPosition)
+        return items[key]?.size ?: 0
+    }
+
+    override fun getGroup(groupPosition: Int): List<Track>? {
+        val key = items.keys.elementAt(groupPosition)
+        return items[key]
+    }
+
+    override fun getChild(groupPosition: Int, childPosition: Int): Track? {
+        val group = getGroup(groupPosition)
+        return group?.get(childPosition)
+    }
+
+    override fun getGroupId(groupPosition: Int) = -1L
+
+    override fun getChildId(groupPosition: Int, childPosition: Int) = -1L
+
+    override fun hasStableIds() = false
+
+    override fun getGroupView(
+        groupPosition: Int,
+        isExpanded: Boolean,
+        convertView: View?,
+        parent: ViewGroup?
+    ): View {
+        val binding = AdapterYearSummaryBinding.inflate(inflater, parent, false)
+        getGroup(groupPosition)?.let { tracks ->
+            val key = items.keys.elementAt(groupPosition)
+            val yearSummary = YearSummary(
+                key ?: "[Unknown]",
+                tracks.size,
+                tracks.sumByDouble { it.distance.toDouble() }.toFloat()
+            )
+            binding.yearSummary = yearSummary
+            binding.executePendingBindings()
+        }
+        return binding.root
+    }
+
+    override fun getChildView(
+        groupPosition: Int,
+        childPosition: Int,
+        isLastChild: Boolean,
+        convertView: View?,
+        parent: ViewGroup?
+    ): View {
         val binding = AdapterTrackBinding.inflate(inflater, parent, false)
-        return ViewHolder(binding, onTrackClick, onTrackLongClick)
-    }
-
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
-    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        val part = items.get(position)
-        viewHolder.bind(part)
-    }
-
-    val inflater by lazy { LayoutInflater.from(context) }
-
-    class ViewHolder(
-        val binding: AdapterTrackBinding,
-        val onTrackClick: ((Track) -> Unit)?,
-        val onTrackLongClick: ((Track) -> Unit)?
-    ) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(track: Track) {
+        getChild(groupPosition, childPosition)?.let { track ->
             binding.track = track
             binding.rowContainer.setOnClickListener {
                 onTrackClick?.run { this(track) }
@@ -53,5 +84,10 @@ class TrackAdapter(val context: Context?)
             }
             binding.executePendingBindings()
         }
+        return binding.root
     }
+
+    override fun isChildSelectable(groupPosition: Int, childPosition: Int) = false
+
+    val inflater by lazy { LayoutInflater.from(context) }
 }

@@ -23,16 +23,19 @@ class TrackViewModel @ViewModelInject constructor(
 
     companion object {
         val ONE_KILOMETER = 1000.0F // [meters]
+        val NTH_POINT_TO_SKIP = 5 // Skip rows to increase performance when displaying all tracks on map
     }
 
     var recordStatus: LiveData<RecordStatus>? = null
     var updateResult = MutableLiveData<Boolean>()
-    var allTracks = MutableLiveData<List<Track>>()
-    var tracks = MutableLiveData<List<Track>>()
+    var tracksWithPoints = MutableLiveData<List<Track>>()
+    var tracks = MutableLiveData<Map<String?, List<Track>>>()
 
     fun fetchTracks() {
         viewModelScope.launch {
-            tracks.postValue(tracksFlow().toList())
+            val tracksList = tracksFlow().toList()
+            val yearTracks = tracksList.groupBy { it.startTimestamp?.take(4) /* group by year */ }
+            tracks.postValue(yearTracks)
         }
     }
 
@@ -54,20 +57,21 @@ class TrackViewModel @ViewModelInject constructor(
         }
     }
 
-    fun fetchAllTracks() {
+    fun fetchTracksWithPoints() {
         ioScope.launch {
             val tracksWithPoints =
                 trackDao
                     .fetchAll()
                     .map { track ->
                         val trackPoints = pointDao.fetchByTrackAsync(
-                            track.id ?: throw IllegalStateException("Empty id")
+                            track.id ?: throw IllegalStateException("Empty id"),
+                            NTH_POINT_TO_SKIP
                         )
                         mapTrackDtoToTrack(track).apply {
                             points = trackPoints
                         }
                     }
-            allTracks.postValue(tracksWithPoints)
+            this@TrackViewModel.tracksWithPoints.postValue(tracksWithPoints)
         }
     }
 
@@ -76,7 +80,7 @@ class TrackViewModel @ViewModelInject constructor(
             ioScope.launch {
                 trackDao.fetch(trackId)?.let { trackDto ->
                     val track = mapTrackDtoToTrack(trackDto)
-                    track.points = pointDao.fetchByTrackAsync(trackId)
+                    track.points = pointDao.fetchByTrackAsync(trackId, 1 /* dont skip nth rows */)
                     postValue(track)
                 }
             }
@@ -89,13 +93,10 @@ class TrackViewModel @ViewModelInject constructor(
                 MutableLiveData<RecordStatus>().apply {
                     ioScope.launch {
                         val track = trackDao.fetch(trackId)
-                        postValue(
-                            RecordStatus(
-                                points.size,
-                                (track?.distance ?: 0.0F) / ONE_KILOMETER,
-                                (System.currentTimeMillis() - (track?.startTimestamp ?: 0L)) / 1000
-                            )
-                        )
+                        val distance = (track?.distance ?: 0.0F) / ONE_KILOMETER
+                        val averageSpeed = if (points.size > 1) points.map { it.speed }.average().toFloat() else 0F
+                        val time = (System.currentTimeMillis() - (track?.startTimestamp ?: 0L)) / 1000
+                        postValue(RecordStatus(points.size, distance, averageSpeed, time))
                     }
                 }
             })

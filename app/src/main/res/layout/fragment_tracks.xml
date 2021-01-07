@@ -98,7 +98,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <ExpandableListView
         android:id="@+id/tracks_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
