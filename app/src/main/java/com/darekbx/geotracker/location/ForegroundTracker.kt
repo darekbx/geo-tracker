@@ -12,6 +12,8 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.darekbx.geotracker.GeoTrackerApplication
 import com.darekbx.geotracker.R
+import com.darekbx.geotracker.livetracking.ILiveTracker
+import com.darekbx.geotracker.model.LiveLocation
 import com.darekbx.geotracker.repository.PointDao
 import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.PointDto
@@ -47,6 +49,9 @@ class ForegroundTracker : Service() {
 
     @Inject
     lateinit var trackDao: TrackDao
+
+    @Inject
+    lateinit var liveTracker: ILiveTracker
 
     private var trackId: Long? = null
     private var sessionDistance = 0.0F
@@ -109,14 +114,27 @@ class ForegroundTracker : Service() {
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             Log.v(GeoTrackerApplication.LOG_TAG, "Received location update: $location")
-
-            ioScope.launch {
-                trackId?.let { trackId ->
+            trackId?.let { trackId ->
+                ioScope.launch {
                     addPoint(trackId, location)
                     appendDistance(location, trackId)
                 }
+                if (liveTrackerEnabled) {
+                    notifyLiveLocation(location, trackId)
+                }
             }
         }
+    }
+
+    private fun notifyLiveLocation(location: Location, trackId: Long) {
+        val liveLocation = LiveLocation(
+            location.latitude,
+            location.longitude,
+            location.speed,
+            location.time,
+            trackId
+        )
+        liveTracker.notifyLocation(liveLocation)
     }
 
     private fun appendDistance(location: Location, trackId: Long) {
@@ -191,4 +209,5 @@ class ForegroundTracker : Service() {
 
     private val locationManager by lazy { getSystemService(Context.LOCATION_SERVICE) as LocationManager }
     private val notificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
+    private val liveTrackerEnabled by lazy { AppPreferences(applicationContext).liveTracking }
 }

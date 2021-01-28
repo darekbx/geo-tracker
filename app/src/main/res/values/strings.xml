@@ -31,7 +31,7 @@
     <string name="delete_yes">Yes</string>
     <string name="delete_no">No</string>
 
-    <string name="settings_gps_category">GPS Settings</string>
+    <string name="settings_gps_category">Settings</string>
     <string name="settings_interval_dialog_title">Minimum interval</string>
     <string name="settings_interval_summary">Set interval in seconds</string>
     <string name="settings_interval">Location refresh min interval [s]</string>
@@ -40,4 +40,5 @@
     <string name="settings_distance">Locaton refresh min distance [m]</string>
     <string name="settings_notification_distance">Notification min distance [m]</string>
     <string name="settings_notification_distance_title">Set distance in meters</string>
+    <string name="settings_live_tracking_title">Live tracking</string>
 </resources>

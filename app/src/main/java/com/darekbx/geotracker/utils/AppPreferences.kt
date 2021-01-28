@@ -12,6 +12,7 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
         val GPS_UPDATE_INTERVAL_KEY = "gps_update_interval_key"
         val GPS_MIN_DISTANCE_KEY = "gps_min_distance_key"
         val NOTIFICATION_MIN_DISTANCE_KEY = "notification_min_distance"
+        val LIVE_TRACKING_KEY = "live_tracking"
     }
 
     var gpsUpdateInterval: Long
@@ -39,6 +40,15 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
         }
         set(value) {
             preferences.edit().putFloat(NOTIFICATION_MIN_DISTANCE_KEY, value).apply()
+        }
+
+    var liveTracking: Boolean
+        get() {
+            val defaultValue = context.resources.getBoolean(R.bool.default_live_tracking)
+            return preferences.getBoolean(LIVE_TRACKING_KEY, defaultValue)
+        }
+        set(value) {
+            preferences.edit().putBoolean(LIVE_TRACKING_KEY, value).apply()
         }
 
     private val preferences by lazy {

@@ -47,6 +47,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 appPreferences.gpsUpdateInterval =
                     sharedPreferences?.getString(key, "$defaultValue")?.toLong() ?: defaultValue
             }
+            AppPreferences.LIVE_TRACKING_KEY -> {
+                val defaultValue = resources.getBoolean(R.bool.default_live_tracking)
+                appPreferences.liveTracking =
+                    sharedPreferences?.getBoolean(key, defaultValue) ?: defaultValue
+            }
         }
     }
 }

@@ -153,7 +153,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                     R.string.points_format,
                     recordStatus.pointsCount,
                     recordStatus.distance,
-                    recordStatus.averageSpeed,
+                    (recordStatus.averageSpeed * 3.6F),
                     DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
                 )
             )

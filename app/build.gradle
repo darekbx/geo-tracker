@@ -34,6 +34,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            buildConfigField 'String', 'LIVE_TRACKER_URL', "\"${herokuLiveTrackerUrl}\""
+            buildConfigField 'String', 'LIVE_TRACKER_TOKEN', "\"${herokuLiveTrackerToken}\""
+        }
     }
 }
 
@@ -68,6 +72,7 @@ dependencies {
     implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01'
     kapt 'androidx.hilt:hilt-compiler:1.0.0-alpha01'
 
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
     implementation "org.osmdroid:osmdroid-android:6.1.8"
 
     implementation 'com.github.darekbx:CARI:1.0.7'

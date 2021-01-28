@@ -26,5 +26,11 @@
             android:defaultValue="@integer/default_min_notification_distance"
             app:useSimpleSummaryProvider="true"
             />
+        <CheckBoxPreference
+            android:key="live_tracking"
+            android:title="@string/settings_live_tracking_title"
+            android:defaultValue="@bool/default_live_tracking"
+            app:useSimpleSummaryProvider="true"
+            />
     </PreferenceCategory>
 </PreferenceScreen>
