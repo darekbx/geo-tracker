@@ -41,4 +41,8 @@
     <string name="settings_notification_distance">Notification min distance [m]</string>
     <string name="settings_notification_distance_title">Set distance in meters</string>
     <string name="settings_live_tracking_title">Live tracking</string>
+    <string name="settings_backup_button_title">Make backup</string>
+    <string name="settings_backup_button_key">backup_button</string>
+    <string name="settings_backup_success">Backup was made!</string>
+    <string name="settings_backup_error">Unable to make a backup, check logs for more details!</string>
 </resources>
