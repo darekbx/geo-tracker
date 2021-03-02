@@ -9,6 +9,9 @@ interface TrackDao {
     @Query("SELECT * FROM track ORDER BY id DESC")
     fun fetchAll(): List<TrackDto>
 
+    @Query("SELECT * FROM track ORDER BY id ASC")
+    fun fetchAllAscending(): List<TrackDto>
+
     @Query("SELECT * FROM track WHERE id = :trackId")
     fun fetch(trackId: Long): TrackDto?
 

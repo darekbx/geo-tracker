@@ -61,7 +61,7 @@ class TrackViewModel @ViewModelInject constructor(
         ioScope.launch {
             val tracksWithPoints =
                 trackDao
-                    .fetchAll()
+                    .fetchAllAscending()
                     .map { track ->
                         val trackPoints = pointDao.fetchByTrackAsync(
                             track.id ?: throw IllegalStateException("Empty id"),

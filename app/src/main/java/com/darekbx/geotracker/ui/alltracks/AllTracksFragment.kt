@@ -65,9 +65,14 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
     private fun displayTracks(tracks: List<Track>) {
         zoomToFirstPoint(tracks)
 
+        val newestTrack = tracks.maxBy { it.id!! }
         tracks.forEach { track ->
+            val color = if (track.id == newestTrack?.id)
+                Color.BLUE
+            else
+                Color.RED
             val polyline = Polyline().apply {
-                outlinePaint.setColor(Color.RED)
+                outlinePaint.setColor(color)
                 outlinePaint.strokeWidth = 6.0F
             }
 
