@@ -26,6 +26,10 @@
     <string name="total_distance">Total distance:</string>
     <string name="total_time">Total time:</string>
     <string name="total_count">Count:</string>
+    <string name="delete_points_title">Delete points</string>
+    <string name="delete_points_message">Are you sure to delete all points form this track?</string>
+    <string name="delete_points_success">Points were deleted.</string>
+    <string name="points_deleted">Points were deleted.</string>
 
     <string name="delete_message">Delete track \"%s\"</string>
     <string name="delete_yes">Yes</string>

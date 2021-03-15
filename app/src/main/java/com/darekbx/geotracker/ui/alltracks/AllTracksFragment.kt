@@ -10,6 +10,7 @@ import androidx.preference.PreferenceManager
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.model.Track
+import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_track.*

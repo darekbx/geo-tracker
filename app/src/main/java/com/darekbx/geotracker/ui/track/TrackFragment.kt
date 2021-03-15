@@ -1,12 +1,10 @@
-package com.darekbx.geotracker.ui.tracks
+package com.darekbx.geotracker.ui.track
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -15,6 +13,7 @@ import androidx.preference.PreferenceManager
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.model.Track
+import com.darekbx.geotracker.ui.tracks.SaveTrackDialog
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_track.*
@@ -24,13 +23,12 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Polyline
 
-
 @AndroidEntryPoint
 class TrackFragment : Fragment(R.layout.fragment_track) {
 
     companion object {
-        val DEFAULT_MAP_ZOOM = 18.0
-        val TRACK_ID_KEY = "track_id_key"
+        const val DEFAULT_MAP_ZOOM = 18.0
+        const val TRACK_ID_KEY = "track_id_key"
     }
 
     private val tracksViewModel: TrackViewModel by viewModels()
@@ -41,16 +39,16 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         tracksViewModel.updateResult.observe(viewLifecycleOwner, Observer {
             loadTrack()
         })
-
+        tracksViewModel.pointsDeleteResult.observe(viewLifecycleOwner, Observer {
+            showDeleteTrackPointsSuccessDialog()
+        })
 
         loadTrack()
         initializeMap()
 
         image_label_edit.setOnClickListener { editLabel() }
         overlapping_button.setOnClickListener { displayOverlappingMap() }
-        clear_points_button.setOnClickListener {
-
-        }
+        clear_points_button.setOnClickListener { confirmDeleteTrackPoints() }
     }
 
     override fun onResume() {
@@ -61,6 +59,30 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     override fun onPause() {
         super.onPause()
         map.onPause()
+    }
+
+    private fun confirmDeleteTrackPoints() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.delete_points_title)
+            .setMessage(R.string.delete_points_message)
+            .setPositiveButton(R.string.delete_yes) { _, _ -> deleteTrackPoints() }
+            .setNegativeButton(R.string.delete_no, null)
+            .show()
+    }
+
+    private fun showDeleteTrackPointsSuccessDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.delete_points_title)
+            .setMessage(R.string.delete_points_success)
+            .setPositiveButton(R.string.button_ok, { _, _ -> loadTrack() })
+            .show()
+    }
+
+    private fun deleteTrackPoints() {
+        val trackId = arguments?.getLong(TRACK_ID_KEY)
+        if (trackId != null) {
+            tracksViewModel.deleteTrackPoints(trackId)
+        }
     }
 
     private fun displayOverlappingMap() {
@@ -83,8 +105,9 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
 
     private fun initializeMap() {
         val context = activity?.applicationContext
-        Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context))
-        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID)
+        Configuration.getInstance()
+            .load(context, PreferenceManager.getDefaultSharedPreferences(context))
+        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
@@ -96,12 +119,24 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             true -> getString(R.string.empty)
             else -> track.label
         }
-        value_label.setText(label)
-        value_start_time.setText(track.startTimestamp)
-        value_end_time.setText(track.endTimestamp ?: getString(R.string.empty))
-        value_time.setText(track.timeDifference)
-        value_distance.setText(getString(R.string.distance_format, track.distance))
-        value_points.setText("${track.points.size}")
+        value_label.text = label
+        value_start_time.text = track.startTimestamp
+        value_end_time.text = track.endTimestamp ?: getString(R.string.empty)
+        value_time.text = track.timeDifference
+        value_distance.text = getString(R.string.distance_format, track.distance)
+
+        if (track.points.isNotEmpty()) {
+            displayFullTrackDetails(track)
+        } else {
+            value_points.text = getString(R.string.points_deleted)
+            speed_view.values = emptyList()
+            altitude_view.values = emptyList()
+            map.visibility = View.INVISIBLE
+        }
+    }
+
+    private fun displayFullTrackDetails(track: Track) {
+        value_points.text = "${track.points.size}"
         speed_view.values = track.points.map { it.speed }
         altitude_view.values = track.points.map { it.altitude.toFloat() }
 
@@ -114,11 +149,11 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         }
 
         val polyline = Polyline().apply {
-            outlinePaint.setColor(Color.RED)
+            outlinePaint.color = Color.RED
             outlinePaint.strokeWidth = 6.0F
         }
 
-        map.getOverlays().add(polyline)
+        map.overlays.add(polyline)
 
         val mapPoints = track.points.map { point -> GeoPoint(point.latitude, point.longitude) }
         polyline.setPoints(mapPoints)

@@ -21,7 +21,7 @@
     </fragment>
     <fragment
         android:id="@+id/trackFragment"
-        android:name="com.darekbx.geotracker.ui.tracks.TrackFragment"
+        android:name="com.darekbx.geotracker.ui.track.TrackFragment"
         android:label="TrackFragment" >
         <action
             android:id="@+id/action_trackFragment_to_allTracksFragment"

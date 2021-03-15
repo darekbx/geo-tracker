@@ -32,6 +32,7 @@ class TrackViewModel @ViewModelInject constructor(
     var updateResult = MutableLiveData<Boolean>()
     var tracksWithPoints = MutableLiveData<List<Track>>()
     var tracks = MutableLiveData<Map<String?, List<Track>>>()
+    var pointsDeleteResult = MutableLiveData<Boolean>()
 
     @ExperimentalCoroutinesApi
     fun fetchTracks() {
@@ -53,6 +54,13 @@ class TrackViewModel @ViewModelInject constructor(
     }
 
     val newTrackid = MutableLiveData<Long>()
+
+    fun deleteTrackPoints(trackId: Long) {
+        ioScope.launch {
+            pointDao.deleteByTrack(trackId)
+            pointsDeleteResult.postValue(true)
+        }
+    }
 
     fun deleteTrack(trackId: Long) {
         ioScope.launch {
