@@ -26,6 +26,12 @@
             android:defaultValue="@integer/default_min_notification_distance"
             app:useSimpleSummaryProvider="true"
             />
+        <EditTextPreference
+            android:key="nth_points_to_skip"
+            android:title="@string/settings_nth_points_to_skip"
+            android:summary="@string/settings_nth_points_to_skip_title"
+            android:defaultValue="@integer/default_nth_points_to_skip"
+            />
         <CheckBoxPreference
             android:key="live_tracking"
             android:title="@string/settings_live_tracking_title"

@@ -23,15 +23,20 @@ import org.osmdroid.views.overlay.Polyline
 class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
 
     companion object {
-        val DEFAULT_MAP_ZOOM = 18.0
+        const val DEFAULT_MAP_ZOOM = 18.0
     }
 
     private val tracksViewModel: TrackViewModel by viewModels()
+    private var trackToOverlap: Track? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loadAlTracks()
+        tracksViewModel.tracksWithPoints.observe(viewLifecycleOwner, Observer { tracks ->
+            displayTracks(tracks)
+        })
+
+        loadAllTracks()
         initializeMap()
     }
 
@@ -45,11 +50,16 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
         map.onPause()
     }
 
-    private fun loadAlTracks() {
-        tracksViewModel.tracksWithPoints.observe(viewLifecycleOwner, Observer { tracks ->
-            displayTracks(tracks)
-        })
-        tracksViewModel.fetchTracksWithPoints()
+    private fun loadAllTracks() {
+        val trackId = arguments?.getLong(TrackFragment.TRACK_ID_KEY)
+        if (trackId != null) {
+            tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
+                trackToOverlap = track
+                tracksViewModel.fetchTracksWithPoints()
+            })
+        } else {
+            tracksViewModel.fetchTracksWithPoints()
+        }
     }
 
     private fun initializeMap() {
@@ -64,28 +74,47 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
 
     private fun displayTracks(tracks: List<Track>) {
         zoomToFirstPoint(tracks)
+        val overlapTrackId = trackToOverlap?.id
+        if (trackToOverlap != null) {
+            displayOverlappedTrack(tracks, overlapTrackId)
+        } else {
+            displayAllTracks(tracks)
+        }
+    }
 
+    private fun displayAllTracks(tracks: List<Track>) {
         val newestTrack = tracks.maxBy { it.id!! }
-        tracks.forEach { track ->
+        for (track in tracks) {
             val color = if (track.id == newestTrack?.id)
                 Color.BLUE
             else
                 Color.RED
-            val polyline = Polyline().apply {
-                outlinePaint.setColor(color)
-                outlinePaint.strokeWidth = 6.0F
-            }
-
-            map.getOverlays().add(polyline)
-
-            val mapPoints = track.points.map { point -> GeoPoint(point.latitude, point.longitude) }
-            polyline.setPoints(mapPoints)
+            displayTrack(track, color)
         }
+    }
+
+    private fun displayOverlappedTrack(tracks: List<Track>, overlapTrackId: Long?) {
+        displayTrack(trackToOverlap!!, Color.RED)
+        for (track in tracks) {
+            if (overlapTrackId == track.id) continue
+            displayTrack(track, Color.GRAY)
+        }
+    }
+
+    private fun displayTrack(track: Track, color: Int) {
+        val polyline = Polyline().apply {
+            outlinePaint.color = color
+            outlinePaint.strokeWidth = 6.0F
+        }
+        map.overlays.add(polyline)
+
+        val mapPoints = track.points.map { point -> GeoPoint(point.latitude, point.longitude) }
+        polyline.setPoints(mapPoints)
     }
 
     private fun zoomToFirstPoint(tracks: List<Track>) {
         tracks
-            .firstOrNull()
+            .lastOrNull()
             ?.points
             ?.firstOrNull()
             ?.let { point ->

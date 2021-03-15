@@ -10,20 +10,22 @@ import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.PointDao
 import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.TrackDto
+import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.utils.DateTimeUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
 
 class TrackViewModel @ViewModelInject constructor(
     private val trackDao: TrackDao,
-    private val pointDao: PointDao
+    private val pointDao: PointDao,
+    private val appPreferences: AppPreferences
 ) : BaseViewModel() {
 
     companion object {
-        val ONE_KILOMETER = 1000.0F // [meters]
-        val NTH_POINT_TO_SKIP = 5 // Skip rows to increase performance when displaying all tracks on map
+        const val ONE_KILOMETER = 1000.0F // [meters]
     }
 
     var recordStatus: LiveData<RecordStatus>? = null
@@ -31,15 +33,17 @@ class TrackViewModel @ViewModelInject constructor(
     var tracksWithPoints = MutableLiveData<List<Track>>()
     var tracks = MutableLiveData<Map<String?, List<Track>>>()
 
+    @ExperimentalCoroutinesApi
     fun fetchTracks() {
         viewModelScope.launch {
             val tracksList = tracksFlow().toList()
-            val yearTracks = tracksList.groupBy { it.startTimestamp?.take(4) /* group by year */ }
+            val yearTracks = tracksList.groupBy { it.startTimestamp?.take(4) /* group by year, take 'yyyy' from 'yyyy-MM-dd HH:mm' date format*/ }
             tracks.postValue(yearTracks)
         }
     }
 
-    private fun tracksFlow() : Flow<Track> {
+    @ExperimentalCoroutinesApi
+    private fun tracksFlow(): Flow<Track> {
         return flow {
             trackDao.fetchAll().forEach { trackDto ->
                 val track = mapTrackDtoToTrack(trackDto)
@@ -59,13 +63,14 @@ class TrackViewModel @ViewModelInject constructor(
 
     fun fetchTracksWithPoints() {
         ioScope.launch {
+            val nthPointsToSkip = appPreferences.nthPointsToSkip
             val tracksWithPoints =
                 trackDao
                     .fetchAllAscending()
                     .map { track ->
                         val trackPoints = pointDao.fetchByTrackAsync(
                             track.id ?: throw IllegalStateException("Empty id"),
-                            NTH_POINT_TO_SKIP
+                            nthPointsToSkip
                         )
                         mapTrackDtoToTrack(track).apply {
                             points = trackPoints
@@ -88,18 +93,20 @@ class TrackViewModel @ViewModelInject constructor(
 
     fun subscribeToPoints(trackId: Long) {
         this@TrackViewModel.recordStatus = Transformations.switchMap(
-            pointDao.fetchByTrack(trackId),
-            { points ->
-                MutableLiveData<RecordStatus>().apply {
-                    ioScope.launch {
-                        val track = trackDao.fetch(trackId)
-                        val distance = (track?.distance ?: 0.0F) / ONE_KILOMETER
-                        val averageSpeed = if (points.size > 1) points.map { it.speed }.average().toFloat() else 0F
-                        val time = (System.currentTimeMillis() - (track?.startTimestamp ?: 0L)) / 1000
-                        postValue(RecordStatus(points.size, distance, averageSpeed, time))
-                    }
+            pointDao.fetchByTrack(trackId)
+        )
+        { points ->
+            MutableLiveData<RecordStatus>().apply {
+                ioScope.launch {
+                    val track = trackDao.fetch(trackId)
+                    val distance = (track?.distance ?: 0.0F) / ONE_KILOMETER
+                    val averageSpeed =
+                        if (points.size > 1) points.map { it.speed }.average().toFloat() else 0F
+                    val time = (System.currentTimeMillis() - (track?.startTimestamp ?: 0L)) / 1000
+                    postValue(RecordStatus(points.size, distance, averageSpeed, time))
                 }
-            })
+            }
+        }
     }
 
     fun updateTrack(trackId: Long, label: String?) {
@@ -136,7 +143,7 @@ class TrackViewModel @ViewModelInject constructor(
     }
 
     private fun getFormattedTimeDiff(start: Long, end: Long): String {
-        var time = (end - start) / 1000
+        val time = (end - start) / 1000
         return DateTimeUtils.getFormattedTime(time.toInt())
     }
 }

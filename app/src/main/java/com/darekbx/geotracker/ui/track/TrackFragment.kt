@@ -1,12 +1,16 @@
 package com.darekbx.geotracker.ui.tracks
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
@@ -38,10 +42,15 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             loadTrack()
         })
 
+
         loadTrack()
         initializeMap()
 
         image_label_edit.setOnClickListener { editLabel() }
+        overlapping_button.setOnClickListener { displayOverlappingMap() }
+        clear_points_button.setOnClickListener {
+
+        }
     }
 
     override fun onResume() {
@@ -52,6 +61,15 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     override fun onPause() {
         super.onPause()
         map.onPause()
+    }
+
+    private fun displayOverlappingMap() {
+        val trackId = arguments?.getLong(TRACK_ID_KEY)
+        val arguments = Bundle(1).apply {
+            putLong(TRACK_ID_KEY, trackId!!)
+        }
+        findNavController()
+            .navigate(R.id.action_trackFragment_to_allTracksFragment, arguments)
     }
 
     private fun loadTrack() {

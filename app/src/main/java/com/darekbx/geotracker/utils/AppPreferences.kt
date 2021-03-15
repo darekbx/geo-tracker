@@ -13,7 +13,17 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
         val GPS_MIN_DISTANCE_KEY = "gps_min_distance_key"
         val NOTIFICATION_MIN_DISTANCE_KEY = "notification_min_distance"
         val LIVE_TRACKING_KEY = "live_tracking"
+        val NTH_POINTS_TO_SKIP = "nth_points_to_skip"
     }
+
+    var nthPointsToSkip: Int
+        get() {
+            val defaultValue = context.resources.getInteger(R.integer.default_nth_points_to_skip)
+            return preferences.getInt(NTH_POINTS_TO_SKIP, defaultValue)
+        }
+        set(value) {
+            preferences.edit().putInt(NTH_POINTS_TO_SKIP, value).apply()
+        }
 
     var gpsUpdateInterval: Long
         get() {
@@ -35,7 +45,8 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
 
     var gpsNotificationMinDistance: Float
         get() {
-            val defaultValue = context.resources.getInteger(R.integer.default_min_notification_distance)
+            val defaultValue =
+                context.resources.getInteger(R.integer.default_min_notification_distance)
             return preferences.getFloat(NOTIFICATION_MIN_DISTANCE_KEY, defaultValue.toFloat())
         }
         set(value) {

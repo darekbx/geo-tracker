@@ -66,6 +66,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 appPreferences.liveTracking =
                     sharedPreferences?.getBoolean(key, defaultValue) ?: defaultValue
             }
+            AppPreferences.NTH_POINTS_TO_SKIP -> {
+                val defaultValue = resources.getInteger(R.integer.default_nth_points_to_skip)
+                appPreferences.nthPointsToSkip =
+                    sharedPreferences?.getString(key, "$defaultValue")?.toInt() ?: defaultValue
+            }
         }
     }
 

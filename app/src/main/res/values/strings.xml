@@ -40,6 +40,8 @@
     <string name="settings_distance">Locaton refresh min distance [m]</string>
     <string name="settings_notification_distance">Notification min distance [m]</string>
     <string name="settings_notification_distance_title">Set distance in meters</string>
+    <string name="settings_nth_points_to_skip">Nth points to skip</string>
+    <string name="settings_nth_points_to_skip_title">Skip rows to increase performance when displaying all tracks on map</string>
     <string name="settings_live_tracking_title">Live tracking</string>
     <string name="settings_backup_button_title">Make backup</string>
     <string name="settings_backup_button_key">backup_button</string>
