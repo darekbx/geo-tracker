@@ -1,6 +1,9 @@
 package com.darekbx.geotracker.ui.tracks
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -14,12 +17,17 @@ import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_track.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Polyline
 
+@SuppressLint("MissingPermission")
 @AndroidEntryPoint
 class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
 
@@ -65,7 +73,8 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
 
     private fun initializeMap() {
         val context = activity?.applicationContext
-        Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context))
+        Configuration.getInstance()
+            .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID)
 
         map.setTileSource(TileSourceFactory.MAPNIK)
@@ -74,7 +83,8 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
     }
 
     private fun displayTracks(tracks: List<Track>) {
-        zoomToFirstPoint(tracks)
+        zoomToCurrentLocation()
+
         val overlapTrackId = trackToOverlap?.id
         if (trackToOverlap != null) {
             displayOverlappedTrack(tracks, overlapTrackId)
@@ -113,17 +123,26 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
         polyline.setPoints(mapPoints)
     }
 
-    private fun zoomToFirstPoint(tracks: List<Track>) {
-        tracks
-            .lastOrNull()
-            ?.points
-            ?.firstOrNull()
-            ?.let { point ->
-                map.controller.apply {
-                    setZoom(DEFAULT_MAP_ZOOM)
-                    val startPoint = GeoPoint(point.latitude, point.longitude)
-                    setCenter(startPoint)
+    @SuppressLint("MissingPermission")
+    private fun zoomToCurrentLocation() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val lastKnownLocation = this@AllTracksFragment.lastKnownLocation
+            if (lastKnownLocation != null) {
+                withContext(Dispatchers.Main) {
+                    map.controller.apply {
+                        setZoom(DEFAULT_MAP_ZOOM)
+                        val startPoint =
+                            GeoPoint(lastKnownLocation.latitude, lastKnownLocation.longitude)
+                        setCenter(startPoint)
+                    }
                 }
             }
+        }
+    }
+
+    private val lastKnownLocation by lazy {
+        val locationManager =
+            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)
     }
 }
