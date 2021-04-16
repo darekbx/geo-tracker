@@ -94,13 +94,8 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
     }
 
     private fun displayAllTracks(tracks: List<Track>) {
-        val newestTrack = tracks.maxBy { it.id!! }
         for (track in tracks) {
-            val color = if (track.id == newestTrack?.id)
-                Color.BLUE
-            else
-                Color.RED
-            displayTrack(track, color)
+            displayTrack(track, Color.RED)
         }
     }
 

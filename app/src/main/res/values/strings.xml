@@ -35,6 +35,8 @@
     <string name="delete_yes">Yes</string>
     <string name="delete_no">No</string>
 
+    <string name="track_was_fixed">Track endTimestamp was fixed.</string>
+
     <string name="settings_gps_category">Settings</string>
     <string name="settings_interval_dialog_title">Minimum interval</string>
     <string name="settings_interval_summary">Set interval in seconds</string>

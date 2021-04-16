@@ -10,4 +10,6 @@ class Track(
     val timeDifference: String?,
     val distance: Float,
     var points: List<PointDto> = emptyList()
-)
+) {
+    val isTimeBroken = startTimestamp?.take(10) != endTimestamp?.take(10)
+}

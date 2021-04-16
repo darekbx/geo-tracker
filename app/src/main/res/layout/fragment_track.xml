@@ -13,7 +13,8 @@
         android:src="@drawable/ic_map"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_medium"
+        android:paddingEnd="@dimen/padding_medium"
         />
     <ImageView
         android:id="@+id/clear_points_button"
@@ -23,6 +24,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@id/overlapping_button"
         android:paddingTop="@dimen/padding_medium"
+        android:paddingEnd="@dimen/padding_medium"
+        />
+    <ImageView
+        android:id="@+id/fix_data_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_fix"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/clear_points_button"
+        android:paddingTop="@dimen/padding_medium"
+        android:paddingEnd="@dimen/padding_medium"
+        android:visibility="gone"
         />
 
     <TextView

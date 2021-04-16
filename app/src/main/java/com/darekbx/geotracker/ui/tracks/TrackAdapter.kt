@@ -1,14 +1,23 @@
 package com.darekbx.geotracker.ui.tracks
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
+import androidx.databinding.BindingAdapter
 import com.darekbx.geotracker.databinding.AdapterTrackBinding
 import com.darekbx.geotracker.databinding.AdapterYearSummaryBinding
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.model.YearSummary
+
+@BindingAdapter("isBroken")
+fun View.isBroken(isBroken: Boolean) {
+    if (isBroken) {
+        setBackgroundColor(Color.RED)
+    }
+}
 
 class TrackAdapter(val context: Context?)
     : BaseExpandableListAdapter() {

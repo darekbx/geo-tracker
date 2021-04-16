@@ -47,6 +47,7 @@
             android:paddingEnd="@dimen/padding_medium"
             android:text="@{@string/start_format(track.startTimestamp)}"
             tools:text="Start: 2020-05-25 12:00"
+            app:isBroken="@{track.timeBroken}"
             />
         <TextView
             android:id="@+id/track_end_time"

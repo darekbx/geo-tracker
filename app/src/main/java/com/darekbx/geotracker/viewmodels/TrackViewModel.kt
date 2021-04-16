@@ -17,6 +17,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
+import java.util.concurrent.TimeUnit
 
 class TrackViewModel @ViewModelInject constructor(
     private val trackDao: TrackDao,
@@ -33,6 +34,7 @@ class TrackViewModel @ViewModelInject constructor(
     var tracksWithPoints = MutableLiveData<List<Track>>()
     var tracks = MutableLiveData<Map<String?, List<Track>>>()
     var pointsDeleteResult = MutableLiveData<Boolean>()
+    var fixResult = MutableLiveData<Boolean>()
 
     @ExperimentalCoroutinesApi
     fun fetchTracks() {
@@ -132,6 +134,23 @@ class TrackViewModel @ViewModelInject constructor(
             )
             val rowId = trackDao.add(track)
             newTrackid.postValue(rowId)
+        }
+    }
+
+    fun fixDate(trackId: Long) {
+        ioScope.launch {
+            val track = trackDao.fetch(trackId)
+            if (track != null) {
+                /**
+                 * Some tracks have broken endtimestamp, they will be fixed by chaning endtimestamp to
+                 * startTimestamp plus one hour
+                 */
+                val endTimestamp = track.startTimestamp + TimeUnit.HOURS.toMillis(1)
+                trackDao.updateDate(trackId, endTimestamp)
+                fixResult.postValue(true)
+            } else {
+                fixResult.postValue(false)
+            }
         }
     }
 

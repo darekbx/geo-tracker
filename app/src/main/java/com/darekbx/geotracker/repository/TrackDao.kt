@@ -29,4 +29,7 @@ interface TrackDao {
 
     @Query("DELETE FROM track WHERE id = :trackId")
     fun delete(trackId: Long)
+
+    @Query("UPDATE track SET end_timestamp = :endTimestamp WHERE id = :trackId")
+    fun updateDate(trackId: Long, endTimestamp: Long)
 }

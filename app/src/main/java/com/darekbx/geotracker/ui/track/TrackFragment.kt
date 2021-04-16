@@ -42,6 +42,9 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         tracksViewModel.pointsDeleteResult.observe(viewLifecycleOwner, Observer {
             showDeleteTrackPointsSuccessDialog()
         })
+        tracksViewModel.fixResult.observe(viewLifecycleOwner, Observer {
+            notifyFixed()
+        })
 
         loadTrack()
         initializeMap()
@@ -49,6 +52,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         image_label_edit.setOnClickListener { editLabel() }
         overlapping_button.setOnClickListener { displayOverlappingMap() }
         clear_points_button.setOnClickListener { confirmDeleteTrackPoints() }
+        fix_data_button.setOnClickListener { fixDate() }
     }
 
     override fun onResume() {
@@ -68,6 +72,20 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             .setPositiveButton(R.string.delete_yes) { _, _ -> deleteTrackPoints() }
             .setNegativeButton(R.string.delete_no, null)
             .show()
+    }
+
+    private fun notifyFixed() {
+        AlertDialog.Builder(requireContext())
+            .setMessage(R.string.track_was_fixed)
+            .setPositiveButton(R.string.button_ok, { _, _ -> loadTrack() })
+            .show()
+    }
+
+    private fun fixDate() {
+        arguments?.let { arguments ->
+            val trackId = arguments.getLong(TRACK_ID_KEY)
+            tracksViewModel.fixDate(trackId)
+        }
     }
 
     private fun showDeleteTrackPointsSuccessDialog() {
@@ -119,11 +137,12 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             true -> getString(R.string.empty)
             else -> track.label
         }
-        value_label.text = label
+        value_label.text = "$label (id: ${track.id})"
         value_start_time.text = track.startTimestamp
         value_end_time.text = track.endTimestamp ?: getString(R.string.empty)
         value_time.text = track.timeDifference
         value_distance.text = getString(R.string.distance_format, track.distance)
+        fix_data_button.visibility = if(track.isTimeBroken) View.VISIBLE else View.GONE
 
         if (track.points.isNotEmpty()) {
             displayFullTrackDetails(track)
