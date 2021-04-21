@@ -16,7 +16,9 @@ import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_all_tracks.*
 import kotlinx.android.synthetic.main.fragment_track.*
+import kotlinx.android.synthetic.main.fragment_track.map
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,6 +34,8 @@ import org.osmdroid.views.overlay.Polyline
 class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
 
     companion object {
+        private val COLOR_RED = Color.parseColor("#f44336")
+        private val COLOR_GRAY = Color.LTGRAY
         const val DEFAULT_MAP_ZOOM = 18.0
     }
 
@@ -42,7 +46,12 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
         super.onViewCreated(view, savedInstanceState)
 
         tracksViewModel.tracksWithPoints.observe(viewLifecycleOwner, Observer { tracks ->
+            loading_view.visibility = View.GONE
             displayTracks(tracks)
+        })
+        tracksViewModel.progress.observe(viewLifecycleOwner, Observer { progress->
+            progress_view.progress = progress.value
+            progress_view.max = progress.max
         })
 
         loadAllTracks()
@@ -60,6 +69,7 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
     }
 
     private fun loadAllTracks() {
+        loading_view.visibility = View.VISIBLE
         val trackId = arguments?.getLong(TrackFragment.TRACK_ID_KEY)
         if (trackId != null) {
             tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
@@ -75,7 +85,7 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
         val context = activity?.applicationContext
         Configuration.getInstance()
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
-        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID)
+        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
@@ -91,19 +101,21 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
         } else {
             displayAllTracks(tracks)
         }
+
+        loading_view.visibility = View.GONE
     }
 
     private fun displayAllTracks(tracks: List<Track>) {
         for (track in tracks) {
-            displayTrack(track, Color.RED)
+            displayTrack(track, COLOR_RED)
         }
     }
 
     private fun displayOverlappedTrack(tracks: List<Track>, overlapTrackId: Long?) {
-        displayTrack(trackToOverlap!!, Color.RED)
+        displayTrack(trackToOverlap!!, COLOR_RED)
         for (track in tracks) {
             if (overlapTrackId == track.id) continue
-            displayTrack(track, Color.GRAY)
+            displayTrack(track, COLOR_GRAY)
         }
     }
 

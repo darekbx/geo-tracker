@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
+import com.darekbx.geotracker.model.Progress
 import com.darekbx.geotracker.model.RecordStatus
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.PointDao
@@ -35,6 +36,7 @@ class TrackViewModel @ViewModelInject constructor(
     var tracks = MutableLiveData<Map<String?, List<Track>>>()
     var pointsDeleteResult = MutableLiveData<Boolean>()
     var fixResult = MutableLiveData<Boolean>()
+    var progress = MutableLiveData<Progress>()
 
     @ExperimentalCoroutinesApi
     fun fetchTracks() {
@@ -74,18 +76,20 @@ class TrackViewModel @ViewModelInject constructor(
     fun fetchTracksWithPoints() {
         ioScope.launch {
             val nthPointsToSkip = appPreferences.nthPointsToSkip
+            val tracks = trackDao.fetchAllAscending()
+            val tracksSize = tracks.size
+            var index = 0
             val tracksWithPoints =
-                trackDao
-                    .fetchAllAscending()
-                    .map { track ->
-                        val trackPoints = pointDao.fetchByTrackAsync(
-                            track.id ?: throw IllegalStateException("Empty id"),
-                            nthPointsToSkip
-                        )
-                        mapTrackDtoToTrack(track).apply {
-                            points = trackPoints
-                        }
+                tracks.map { track ->
+                    val trackPoints = pointDao.fetchByTrackAsync(
+                        track.id ?: throw IllegalStateException("Empty id"),
+                        nthPointsToSkip
+                    )
+                    progress.postValue(Progress(++index, tracksSize))
+                    mapTrackDtoToTrack(track).apply {
+                        points = trackPoints
                     }
+                }
             this@TrackViewModel.tracksWithPoints.postValue(tracksWithPoints)
         }
     }
