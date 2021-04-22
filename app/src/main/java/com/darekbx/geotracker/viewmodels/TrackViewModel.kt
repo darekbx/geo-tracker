@@ -1,10 +1,7 @@
 package com.darekbx.geotracker.viewmodels
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.darekbx.geotracker.model.Progress
 import com.darekbx.geotracker.model.RecordStatus
 import com.darekbx.geotracker.model.Track
@@ -32,7 +29,6 @@ class TrackViewModel @ViewModelInject constructor(
 
     var recordStatus: LiveData<RecordStatus>? = null
     var updateResult = MutableLiveData<Boolean>()
-    var tracksWithPoints = MutableLiveData<List<Track>>()
     var tracks = MutableLiveData<Map<String?, List<Track>>>()
     var pointsDeleteResult = MutableLiveData<Boolean>()
     var fixResult = MutableLiveData<Boolean>()
@@ -42,7 +38,8 @@ class TrackViewModel @ViewModelInject constructor(
     fun fetchTracks() {
         viewModelScope.launch {
             val tracksList = tracksFlow().toList()
-            val yearTracks = tracksList.groupBy { it.startTimestamp?.take(4) /* group by year, take 'yyyy' from 'yyyy-MM-dd HH:mm' date format*/ }
+            val yearTracks =
+                tracksList.groupBy { it.startTimestamp?.take(4) /* group by year, take 'yyyy' from 'yyyy-MM-dd HH:mm' date format */ }
             tracks.postValue(yearTracks)
         }
     }
@@ -73,26 +70,24 @@ class TrackViewModel @ViewModelInject constructor(
         }
     }
 
-    fun fetchTracksWithPoints() {
-        ioScope.launch {
-            val nthPointsToSkip = appPreferences.nthPointsToSkip
-            val tracks = trackDao.fetchAllAscending()
-            val tracksSize = tracks.size
-            var index = 0
-            val tracksWithPoints =
-                tracks.map { track ->
-                    val trackPoints = pointDao.fetchByTrackAsync(
-                        track.id ?: throw IllegalStateException("Empty id"),
-                        nthPointsToSkip
-                    )
-                    progress.postValue(Progress(++index, tracksSize))
-                    mapTrackDtoToTrack(track).apply {
-                        points = trackPoints
-                    }
+    fun fetchTracksWithPoints() = flow {
+        val nthPointsToSkip = appPreferences.nthPointsToSkip
+        val tracksSize = trackDao.countAllTracks()
+        var index = 0
+        trackDao
+            .fetchAllAscending()
+            .forEach { trackDto ->
+                val trackPoints = pointDao.fetchByTrackAsync(
+                    trackDto.id ?: throw IllegalStateException("Empty id"),
+                    nthPointsToSkip
+                )
+                progress.postValue(Progress(++index, tracksSize))
+                val track = mapTrackDtoToTrack(trackDto).apply {
+                    points = trackPoints
                 }
-            this@TrackViewModel.tracksWithPoints.postValue(tracksWithPoints)
-        }
-    }
+                emit(track)
+            }
+    }.asLiveData(Dispatchers.IO)
 
     fun fetchTrack(trackId: Long) =
         MutableLiveData<Track>().apply {

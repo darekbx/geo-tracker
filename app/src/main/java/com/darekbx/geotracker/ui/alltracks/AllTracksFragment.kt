@@ -1,4 +1,4 @@
-package com.darekbx.geotracker.ui.tracks
+package com.darekbx.geotracker.ui.alltracks
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -35,8 +35,8 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
 
     companion object {
         private val COLOR_RED = Color.parseColor("#f44336")
-        private val COLOR_GRAY = Color.LTGRAY
-        const val DEFAULT_MAP_ZOOM = 18.0
+        private val COLOR_GRAY = Color.parseColor("#999999")
+        const val DEFAULT_MAP_ZOOM = 13.0
     }
 
     private val tracksViewModel: TrackViewModel by viewModels()
@@ -45,17 +45,18 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tracksViewModel.tracksWithPoints.observe(viewLifecycleOwner, Observer { tracks ->
-            loading_view.visibility = View.GONE
-            displayTracks(tracks)
-        })
-        tracksViewModel.progress.observe(viewLifecycleOwner, Observer { progress->
+        tracksViewModel.progress.observe(viewLifecycleOwner, Observer { progress ->
             progress_view.progress = progress.value
             progress_view.max = progress.max
+
+            if (progress.isCompleted) {
+                loading_view.visibility = View.GONE
+            }
         })
 
         loadAllTracks()
         initializeMap()
+        zoomToCurrentLocation()
     }
 
     override fun onResume() {
@@ -74,11 +75,20 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
         if (trackId != null) {
             tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
                 trackToOverlap = track
-                tracksViewModel.fetchTracksWithPoints()
+                displayTrack(trackToOverlap!!, COLOR_RED)
+                fetchTracksWithPoints()
             })
         } else {
-            tracksViewModel.fetchTracksWithPoints()
+            fetchTracksWithPoints()
         }
+    }
+
+    private fun fetchTracksWithPoints() {
+        tracksViewModel.fetchTracksWithPoints().observe(viewLifecycleOwner, Observer { track ->
+            if (trackToOverlap?.id != track.id) {
+                displayTrack(track)
+            }
+        })
     }
 
     private fun initializeMap() {
@@ -92,43 +102,23 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
         map.setMultiTouchControls(true)
     }
 
-    private fun displayTracks(tracks: List<Track>) {
-        zoomToCurrentLocation()
-
-        val overlapTrackId = trackToOverlap?.id
-        if (trackToOverlap != null) {
-            displayOverlappedTrack(tracks, overlapTrackId)
-        } else {
-            displayAllTracks(tracks)
-        }
-
-        loading_view.visibility = View.GONE
-    }
-
-    private fun displayAllTracks(tracks: List<Track>) {
-        for (track in tracks) {
-            displayTrack(track, COLOR_RED)
-        }
-    }
-
-    private fun displayOverlappedTrack(tracks: List<Track>, overlapTrackId: Long?) {
-        displayTrack(trackToOverlap!!, COLOR_RED)
-        for (track in tracks) {
-            if (overlapTrackId == track.id) continue
-            displayTrack(track, COLOR_GRAY)
-        }
-    }
-
-    private fun displayTrack(track: Track, color: Int) {
+    private fun displayTrack(track: Track, color: Int = provideColor()) {
         val polyline = Polyline().apply {
             outlinePaint.color = color
             outlinePaint.strokeWidth = 6.0F
         }
-        map.overlays.add(polyline)
 
         val mapPoints = track.points.map { point -> GeoPoint(point.latitude, point.longitude) }
         polyline.setPoints(mapPoints)
+        map.overlays.add(polyline)
+        map.invalidateMapCoordinates(map.projection.screenRect)
     }
+
+    private fun provideColor() =
+        when (trackToOverlap?.id) {
+            null -> COLOR_RED
+            else -> COLOR_GRAY
+        }
 
     @SuppressLint("MissingPermission")
     private fun zoomToCurrentLocation() {

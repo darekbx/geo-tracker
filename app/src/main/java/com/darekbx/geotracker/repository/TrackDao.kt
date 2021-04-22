@@ -9,6 +9,9 @@ interface TrackDao {
     @Query("SELECT * FROM track ORDER BY id DESC")
     fun fetchAll(): List<TrackDto>
 
+    @Query("SELECT COUNT(id) FROM track LIMIT 1")
+    fun countAllTracks(): Int
+
     @Query("SELECT * FROM track ORDER BY id ASC")
     fun fetchAllAscending(): List<TrackDto>
 
