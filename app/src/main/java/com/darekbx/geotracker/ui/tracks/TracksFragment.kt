@@ -68,6 +68,10 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 .navigate(R.id.action_tracksFragment_to_settingsFragment)
         }
 
+        button_calendar.setOnClickListener {
+            // TODO
+        }
+
         tracks_list.setAdapter(trackAdapter)
 
         activity?.registerReceiver(stopBroadcast, IntentFilter(STOP_ACTION))
@@ -267,7 +271,8 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
                 Manifest.permission.FOREGROUND_SERVICE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
             ),
             onDenied = { showPermissionsDeniedDialog() }
         )

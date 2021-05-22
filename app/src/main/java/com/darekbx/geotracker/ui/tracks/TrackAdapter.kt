@@ -34,6 +34,7 @@ class TrackAdapter(val context: Context?)
     override fun getGroupCount() = items.size
 
     override fun getChildrenCount(groupPosition: Int): Int {
+        if (items.keys.isEmpty()) return 0
         val key = items.keys.elementAt(groupPosition)
         return items[key]?.size ?: 0
     }

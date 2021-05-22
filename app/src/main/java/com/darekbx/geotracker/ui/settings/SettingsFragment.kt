@@ -1,8 +1,10 @@
 package com.darekbx.geotracker.ui.tracks
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.darekbx.geotracker.R
@@ -27,6 +29,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             ?.setOnPreferenceClickListener(object : Preference.OnPreferenceClickListener {
                 override fun onPreferenceClick(preference: Preference?): Boolean {
                     makeBackup()
+                    return false
+                }
+            })
+
+        findPreference<Preference>(getString(R.string.settings_restore_button_key))
+            ?.setOnPreferenceClickListener(object : Preference.OnPreferenceClickListener {
+                override fun onPreferenceClick(preference: Preference?): Boolean {
+                    restoreDataFromBackup()
                     return false
                 }
             })
@@ -75,11 +85,34 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     }
 
     private fun makeBackup() {
-        AppDatabase.makeBackup(requireContext()) { result ->
+        AppDatabase.makeBackup(requireContext()) { backupFilePath ->
+            CoroutineScope(Dispatchers.Main).launch {
+                val message = when(backupFilePath) {
+                    null -> getString(R.string.settings_backup_error)
+                    else -> getString(R.string.settings_backup_success, backupFilePath)
+                }
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun restoreDataFromBackup() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            setType("file/*")
+        }
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            result.data?.data?.path?.let { filePath ->
+                doRestoreData(filePath)
+            }
+        }.launch(intent)
+    }
+
+    private fun doRestoreData(filePath: String) {
+        AppDatabase.restoreDataFromBackup(requireContext(), filePath) { result ->
             CoroutineScope(Dispatchers.Main).launch {
                 val message = when {
-                    result -> R.string.settings_backup_success
-                    else -> R.string.settings_backup_error
+                    result -> R.string.settings_restore_success
+                    else -> R.string.settings_restore_error
                 }
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }

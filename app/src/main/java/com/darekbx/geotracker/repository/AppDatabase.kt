@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,7 +23,27 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         val DB_NAME = "geo_tracker"
 
-        fun makeBackup(context: Context, callback: (success: Boolean) -> Unit) {
+        fun restoreDataFromBackup(context: Context, sourcePath: String, callback: (success: Boolean) -> Unit) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val databaseFile = context.getDatabasePath(DB_NAME)
+                try {
+                    if (databaseFile.exists()) {
+                        context.deleteDatabase(DB_NAME)
+                    }
+                    FileInputStream(sourcePath).use { inStream ->
+                        FileOutputStream(databaseFile.toString()).use { outStream ->
+                            FileUtils.copy(inStream, outStream)
+                            callback(true)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    callback(false)
+                }
+            }
+        }
+
+        fun makeBackup(context: Context, callback: (path: String?) -> Unit) {
             try {
                 val currentDate = SimpleDateFormat("yyyyMMdd_HHmm").format(Calendar.getInstance().timeInMillis)
                 val outFile = "geotracker_db_$currentDate.sqlite"
@@ -40,15 +61,15 @@ abstract class AppDatabase : RoomDatabase() {
                             openOutputStream(uri)?.use { outStream ->
                                 FileInputStream(databaseFile).use { inStream ->
                                     FileUtils.copy(inStream, outStream)
-                                    callback(true)
+                                    callback(uri.path)
                                 }
-                            } ?: callback(false)
-                        } ?: callback(false)
+                            } ?: callback(null)
+                        } ?: callback(null)
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                callback(false)
+                callback(null)
             }
         }
     }

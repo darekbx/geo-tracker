@@ -32,15 +32,21 @@
             android:summary="@string/settings_nth_points_to_skip_title"
             android:defaultValue="@integer/default_nth_points_to_skip"
             />
+        <!-- Live tracker url is not defined in gradle //-->
         <CheckBoxPreference
             android:key="live_tracking"
             android:title="@string/settings_live_tracking_title"
             android:defaultValue="@bool/default_live_tracking"
             app:useSimpleSummaryProvider="true"
+            android:enabled="false"
             />
         <Preference
             android:key="@string/settings_backup_button_key"
             android:title="@string/settings_backup_button_title"
+            />
+        <Preference
+            android:key="@string/settings_restore_button_key"
+            android:title="@string/settings_restore_button_title"
             />
     </PreferenceCategory>
 </PreferenceScreen>

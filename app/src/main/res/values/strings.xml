@@ -51,6 +51,10 @@
     <string name="settings_live_tracking_title">Live tracking</string>
     <string name="settings_backup_button_title">Make backup</string>
     <string name="settings_backup_button_key">backup_button</string>
-    <string name="settings_backup_success">Backup was made!</string>
+    <string name="settings_restore_button_title">Restore data from backup</string>
+    <string name="settings_restore_button_key">restore_button</string>
+    <string name="settings_backup_success">Backup was saved to: %s</string>
     <string name="settings_backup_error">Unable to make a backup, check logs for more details!</string>
+    <string name="settings_restore_success">Data was restored!</string>
+    <string name="settings_restore_error">Unable to make restore data, check logs for more details!</string>
 </resources>
