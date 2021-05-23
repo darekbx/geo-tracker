@@ -69,7 +69,8 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         }
 
         button_calendar.setOnClickListener {
-            // TODO
+            findNavController()
+                .navigate(R.id.action_tracksFragment_to_activityCalendarFragment)
         }
 
         tracks_list.setAdapter(trackAdapter)
