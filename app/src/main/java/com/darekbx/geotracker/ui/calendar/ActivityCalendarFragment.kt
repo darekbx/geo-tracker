@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.darekbx.geotracker.R
-import com.darekbx.geotracker.model.Track
+import com.darekbx.geotracker.model.DaySummary
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.CalendarMonth
@@ -40,20 +40,22 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tracksViewModel.fetchTracks()
-        tracksViewModel.tracks.observe(viewLifecycleOwner, Observer { yearTracks ->
-            val tracks = yearTracks.flatMap { it.value }
-            createCalendar(tracks)
+        loading_view.visibility = View.VISIBLE
+
+        tracksViewModel.fetchDaySummaries()
+        tracksViewModel.daySummaries.observe(viewLifecycleOwner, Observer { daySummaries ->
+            createCalendar(daySummaries)
+            loading_view.visibility = View.GONE
         })
     }
 
-    private fun createCalendar(tracks: List<Track>) {
+    private fun createCalendar(daySummaries: List<DaySummary>) {
         val calendar = Calendar.getInstance()
         val dayOfYear = calendar.get(Calendar.DAY_OF_YEAR)
         val year = calendar.get(Calendar.YEAR)
 
-        calendar_view.dayBinder = dayBinder(dayOfYear, year, tracks)
-        calendar_view.monthHeaderBinder = monthHeaderBinder()
+        calendar_view.dayBinder = dayBinder(dayOfYear, year, daySummaries)
+        calendar_view.monthHeaderBinder = monthHeaderBinder(daySummaries)
 
         val currentMonth = YearMonth.now()
         val firstMonth = currentMonth.minusMonths(10)
@@ -65,7 +67,7 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
     private fun dayBinder(
         dayOfYear: Int,
         year: Int,
-        tracks: List<Track>
+        daySummaries: List<DaySummary>
     ) = object : DayBinder<DayViewContainer> {
 
         override fun create(view: View) = DayViewContainer(view)
@@ -80,12 +82,18 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
             container: DayViewContainer
         ) {
             if (day.owner == DayOwner.THIS_MONTH) {
+                container.dayTextView.setTextColor(Color.BLACK)
                 markCurrentDay(day, container)
                 markOnBikeDay(day, container)
-                container.dayTextView.setTextColor(Color.BLACK)
             } else {
-                container.dayTextView.setTextColor(Color.LTGRAY)
+                container.dayTextView.setTextColor(Color.WHITE)
+                reset(container)
             }
+        }
+
+        private fun reset(container: DayViewContainer) {
+            container.dayTextView.setBackgroundColor(Color.WHITE)
+            container.kilometersTextView.text = ""
         }
 
         private fun markOnBikeDay(
@@ -95,18 +103,22 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
             val paddedMonth = day.date.monthValue.toString().padStart(2, '0')
             val paddedDay = day.date.dayOfMonth.toString().padStart(2, '0')
             val dateFormatted = "${day.date.year}-${paddedMonth}-${paddedDay}"
+            val daySummary = daySummaries.firstOrNull { it.dateFormatted == dateFormatted }
 
-            // TODO move to view model, sun ascync, without group by year
-            // TODO in month headere add sum distance, also from viewmodel
-            val sumDistance = tracks
-                .asSequence()
-                .filter { it.startTimestamp?.startsWith(dateFormatted) ?: false }
-                .sumByDouble { it.distance.toDouble() }
-
-            if (sumDistance > 0) {
-                container.dayTextView.setBackgroundColor(Color.argb(60, 40, 220, 80))
-                container.kilometersTextView.setText("%.2fkm".format(sumDistance))
+            if (daySummary != null && daySummary.sumDistance > 0) {
+                val color = obtainColor(daySummary.sumDistance)
+                container.dayTextView.setBackgroundColor(color)
+                container.kilometersTextView.setText("%.2fkm".format(daySummary.sumDistance))
+            } else {
+                reset(container)
             }
+        }
+
+        private fun obtainColor(sumDistance: Double) = when {
+            sumDistance > 0 && sumDistance <= 10 -> Color.argb(40, 40, 220, 80)
+            sumDistance > 10 && sumDistance <= 20 -> Color.argb(80, 40, 220, 80)
+            sumDistance > 20 && sumDistance <= 30 -> Color.argb(120, 40, 220, 80)
+            else -> Color.argb(160, 40, 220, 80)
         }
 
         private fun markCurrentDay(
@@ -119,12 +131,25 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
         }
     }
 
-    private fun monthHeaderBinder() = object : MonthHeaderFooterBinder<MonthHeaderContainer> {
+    private fun monthHeaderBinder(daySummaries: List<DaySummary>) =
+        object : MonthHeaderFooterBinder<MonthHeaderContainer> {
 
-        override fun bind(container: MonthHeaderContainer, month: CalendarMonth) {
-            container.textView.text = month.yearMonth.month.name
+            override fun create(view: View) = MonthHeaderContainer(view)
+
+            override fun bind(container: MonthHeaderContainer, month: CalendarMonth) {
+                val monthName = month.yearMonth.month.name
+                val paddedMonth = month.month.toString().padStart(2, '0')
+                val yearMonth = "${month.year}-${paddedMonth}"
+                val monthSummaries = daySummaries.filter { it.dateFormatted.take(7) == yearMonth }
+                val monthSummariesCount = monthSummaries.size
+
+                if (monthSummariesCount > 0) {
+                    val monthDistance = monthSummaries.sumByDouble { it.sumDistance }
+                    container.textView.text = "$monthName, %.2fkm, ${monthSummariesCount} entries"
+                        .format(monthDistance)
+                } else {
+                    container.textView.text = monthName
+                }
+            }
         }
-
-        override fun create(view: View) = MonthHeaderContainer(view)
-    }
 }

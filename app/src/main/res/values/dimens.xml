@@ -4,8 +4,8 @@
     <dimen name="padding_medium">16dp</dimen>
     <dimen name="padding_large">32dp</dimen>
 
-    <integer name="default_gps_interval">10</integer>
-    <integer name="default_gps_distance">2</integer>
+    <integer name="default_gps_interval">30</integer>
+    <integer name="default_gps_distance">30</integer>
     <integer name="default_min_notification_distance">250</integer>
     <integer name="default_nth_points_to_skip">5</integer>
     <bool name="default_live_tracking">false</bool>

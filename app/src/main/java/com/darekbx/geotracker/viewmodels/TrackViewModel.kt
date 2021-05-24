@@ -2,6 +2,7 @@ package com.darekbx.geotracker.viewmodels
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.darekbx.geotracker.model.DaySummary
 import com.darekbx.geotracker.model.Progress
 import com.darekbx.geotracker.model.RecordStatus
 import com.darekbx.geotracker.model.Track
@@ -30,6 +31,7 @@ class TrackViewModel @ViewModelInject constructor(
     var recordStatus: LiveData<RecordStatus>? = null
     var updateResult = MutableLiveData<Boolean>()
     var tracks = MutableLiveData<Map<String?, List<Track>>>()
+    var daySummaries = MutableLiveData<List<DaySummary>>()
     var pointsDeleteResult = MutableLiveData<Boolean>()
     var fixResult = MutableLiveData<Boolean>()
     var progress = MutableLiveData<Progress>()
@@ -41,6 +43,19 @@ class TrackViewModel @ViewModelInject constructor(
             val yearTracks =
                 tracksList.groupBy { it.startTimestamp?.take(4) /* group by year, take 'yyyy' from 'yyyy-MM-dd HH:mm' date format */ }
             tracks.postValue(yearTracks)
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    fun fetchDaySummaries() {
+        viewModelScope.launch {
+            val tracks = tracksFlow().toList()
+            val sumDistances = tracks
+                .asSequence()
+                .groupBy { it.startTimestamp!!.take(10) }
+                .mapValues { it.value.sumByDouble { it.distance.toDouble() } }
+                .map { DaySummary(it.key, it.value) }
+            daySummaries.postValue(sumDistances)
         }
     }
 
