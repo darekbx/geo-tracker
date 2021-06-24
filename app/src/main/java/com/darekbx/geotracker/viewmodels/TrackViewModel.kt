@@ -9,6 +9,7 @@ import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.PointDao
 import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.TrackDto
+import com.darekbx.geotracker.repository.entities.TrackPoints
 import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.utils.DateTimeUtils
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +63,7 @@ class TrackViewModel @ViewModelInject constructor(
     @ExperimentalCoroutinesApi
     private fun tracksFlow(): Flow<Track> {
         return flow {
-            trackDao.fetchAll().forEach { trackDto ->
+            trackDao.fetchAll2().forEach { trackDto ->
                 val track = mapTrackDtoToTrack(trackDto)
                 emit(track)
             }
@@ -181,6 +182,12 @@ class TrackViewModel @ViewModelInject constructor(
             difference,
             (trackDto.distance ?: 0.0F) / ONE_KILOMETER
         )
+    }
+
+    private fun mapTrackDtoToTrack(trackPoints: TrackPoints): Track {
+        return mapTrackDtoToTrack(trackPoints.trackDto).apply {
+            pointsCount = trackPoints.pointsCount
+        }
     }
 
     private fun getFormattedTimeDiff(start: Long, end: Long): String {

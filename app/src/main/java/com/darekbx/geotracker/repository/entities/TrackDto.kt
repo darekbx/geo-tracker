@@ -1,8 +1,15 @@
 package com.darekbx.geotracker.repository.entities
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+
+@Entity
+data class TrackPoints(
+    @Embedded val trackDto: TrackDto,
+    val pointsCount: Int
+)
 
 @Entity(tableName = "track")
 class TrackDto(
