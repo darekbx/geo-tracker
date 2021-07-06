@@ -9,6 +9,8 @@
     <string name="button_ok">OK</string>
     <string name="button_save">Save</string>
     <string name="button_stop">Stop</string>
+    <string name="button_confirm">Confirm</string>
+    <string name="button_cancel">Cancel</string>
     <string name="enter_label_title">Enter label</string>
     <string name="label_hint">Label</string>
     <string name="start_format">Start: %s</string>
@@ -36,6 +38,8 @@
     <string name="delete_no">No</string>
 
     <string name="track_was_fixed">Track endTimestamp was fixed.</string>
+    <string name="exit_while_recording">Exit app while recording?</string>
+    <string name="wait_for"><![CDATA[Wait for <b>%ds</b>]]></string>
 
     <string name="settings_gps_category">Settings</string>
     <string name="settings_interval_dialog_title">Minimum interval</string>

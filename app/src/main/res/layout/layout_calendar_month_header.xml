@@ -10,4 +10,5 @@
     android:textColor="#fff"
     android:background="@color/colorAccent"
     android:padding="@dimen/padding_small"
+    tools:viewBindingIgnore="true"
     tools:text="16" />

@@ -35,6 +35,8 @@ class ForegroundTracker : Service() {
         val TRACK_ID_KEY = "track_id_key"
         val NOTIFICATION_ID = 100
         val NOTIFICATION_CHANNEL_ID = "location_channel_id"
+
+        var IS_RUNNING = false
     }
 
     private val viewModelJob = SupervisorJob()
@@ -69,11 +71,13 @@ class ForegroundTracker : Service() {
             getString(R.string.notification_text)
         )
         startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+        IS_RUNNING = true
     }
 
     override fun onDestroy() {
         super.onDestroy()
         locationManager?.removeUpdates(locationListener)
+        IS_RUNNING = false
         Log.v(GeoTrackerApplication.LOG_TAG, "Service was destroyed!")
     }
 
