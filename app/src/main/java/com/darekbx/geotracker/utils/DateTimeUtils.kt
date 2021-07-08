@@ -1,14 +1,16 @@
 package com.darekbx.geotracker.utils
 
+import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 
 object DateTimeUtils {
 
-    val DATE_FORMAT = "yyyy-MM-dd HH:mm"
+    private const val DATE_FORMAT = "yyyy-MM-dd HH:mm"
 
+    @SuppressLint("SimpleDateFormat")
     fun format(timestamp: Long?) = timestamp?.let {
         SimpleDateFormat(DATE_FORMAT).format(it)
-    } ?: null
+    }
 
     fun getFormattedTime(timeInSeconds: Int): String {
         var time = timeInSeconds

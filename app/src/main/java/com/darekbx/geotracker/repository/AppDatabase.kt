@@ -17,11 +17,11 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Database(entities = arrayOf(PointDto::class, TrackDto::class), version = 1, exportSchema = false)
+@Database(entities = [PointDto::class, TrackDto::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
-        val DB_NAME = "geo_tracker"
+        const val DB_NAME = "geo_tracker"
 
         fun restoreDataFromBackup(context: Context, sourcePath: String, callback: (success: Boolean) -> Unit) {
             CoroutineScope(Dispatchers.IO).launch {

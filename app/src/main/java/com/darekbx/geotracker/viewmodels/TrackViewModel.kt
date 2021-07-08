@@ -55,9 +55,8 @@ class TrackViewModel @ViewModelInject constructor(
         viewModelScope.launch {
             val tracks = tracksFlow().toList()
             val sumDistances = tracks
-                .asSequence()
                 .groupBy { it.startTimestamp!!.take(10) }
-                .mapValues { it.value.sumByDouble { it.distance.toDouble() } }
+                .mapValues { entry -> entry.value.sumByDouble { it.distance.toDouble() } }
                 .map { DaySummary(it.key, it.value) }
             daySummaries.postValue(sumDistances)
         }

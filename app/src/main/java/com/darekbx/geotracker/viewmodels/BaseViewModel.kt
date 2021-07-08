@@ -9,7 +9,6 @@ open class BaseViewModel : ViewModel() {
 
     private val viewModelJob = SupervisorJob()
 
-    protected val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     protected val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     override fun onCleared() {

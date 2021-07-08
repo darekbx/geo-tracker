@@ -8,7 +8,7 @@ import dagger.hilt.android.HiltAndroidApp
 class GeoTrackerApplication : Application() {
 
     companion object {
-        val LOG_TAG = "GeoTracker"
+        const val LOG_TAG = "GeoTracker"
     }
 
     override fun onCreate() {

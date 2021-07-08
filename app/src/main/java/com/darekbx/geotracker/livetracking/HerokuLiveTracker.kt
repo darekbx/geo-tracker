@@ -31,10 +31,13 @@ class HerokuLiveTracker : ILiveTracker {
                 .post(postBody)
                 .build()
             try {
-                httpClient.newCall(request).execute().use({ response ->
-                    Log.d(GeoTrackerApplication.LOG_TAG, "Live tracker response: HTTP ${response.code}")
+                httpClient.newCall(request).execute().use { response ->
+                    Log.d(
+                        GeoTrackerApplication.LOG_TAG,
+                        "Live tracker response: HTTP ${response.code}"
+                    )
                     saveLastLiveLocationTime(liveLocation)
-                })
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

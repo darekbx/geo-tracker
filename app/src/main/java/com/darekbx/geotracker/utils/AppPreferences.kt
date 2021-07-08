@@ -9,11 +9,11 @@ import javax.inject.Inject
 class AppPreferences @Inject constructor(@ApplicationContext val context: Context) {
 
     companion object {
-        val GPS_UPDATE_INTERVAL_KEY = "gps_update_interval_key"
-        val GPS_MIN_DISTANCE_KEY = "gps_min_distance_key"
-        val NOTIFICATION_MIN_DISTANCE_KEY = "notification_min_distance"
-        val LIVE_TRACKING_KEY = "live_tracking"
-        val NTH_POINTS_TO_SKIP = "nth_points_to_skip"
+        const val GPS_UPDATE_INTERVAL_KEY = "gps_update_interval_key"
+        const val GPS_MIN_DISTANCE_KEY = "gps_min_distance_key"
+        const val NOTIFICATION_MIN_DISTANCE_KEY = "notification_min_distance"
+        const val LIVE_TRACKING_KEY = "live_tracking"
+        const val NTH_POINTS_TO_SKIP = "nth_points_to_skip"
     }
 
     var nthPointsToSkip: Int

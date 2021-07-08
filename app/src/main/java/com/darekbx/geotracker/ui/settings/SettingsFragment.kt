@@ -1,4 +1,4 @@
-package com.darekbx.geotracker.ui.tracks
+package com.darekbx.geotracker.ui.settings
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -25,32 +25,28 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_main, rootKey)
 
-        findPreference<Preference>(getString(R.string.settings_backup_button_key))
-            ?.setOnPreferenceClickListener(object : Preference.OnPreferenceClickListener {
-                override fun onPreferenceClick(preference: Preference?): Boolean {
-                    makeBackup()
-                    return false
-                }
-            })
+        findPreference<Preference>(getString(R.string.settings_backup_button_key))?.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                makeBackup()
+                false
+            }
 
         findPreference<Preference>(getString(R.string.settings_restore_button_key))
-            ?.setOnPreferenceClickListener(object : Preference.OnPreferenceClickListener {
-                override fun onPreferenceClick(preference: Preference?): Boolean {
-                    restoreDataFromBackup()
-                    return false
-                }
-            })
+            ?.setOnPreferenceClickListener {
+                restoreDataFromBackup()
+                false
+            }
     }
 
     override fun onResume() {
         super.onResume()
-        getPreferenceScreen().getSharedPreferences()
+        preferenceScreen.sharedPreferences
             .registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onPause() {
         super.onPause()
-        getPreferenceScreen().getSharedPreferences()
+        preferenceScreen.sharedPreferences
             .unregisterOnSharedPreferenceChangeListener(this)
     }
 
@@ -98,7 +94,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     private fun restoreDataFromBackup() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-            setType("file/*")
+            type = "file/*"
         }
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             result.data?.data?.path?.let { filePath ->

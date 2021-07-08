@@ -22,13 +22,15 @@ import com.darekbx.geotracker.utils.PermissionRequester
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracks.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     companion object {
-        val STOP_ACTION = "stop_action"
+        const val STOP_ACTION = "stop_action"
     }
 
     @Inject
@@ -83,9 +85,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         stopTrackingService()
 
         try {
-            stopBroadcast?.let {
-                activity?.unregisterReceiver(stopBroadcast)
-            }
+            activity?.unregisterReceiver(stopBroadcast)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -158,7 +158,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun observePointsChanges() {
         tracksViewModel.recordStatus?.observe(viewLifecycleOwner, Observer { recordStatus ->
-            recording_status.setText(
+            recording_status.text =
                 getString(
                     R.string.points_format,
                     recordStatus.pointsCount,
@@ -166,7 +166,6 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                     (recordStatus.averageSpeed * 3.6F),
                     DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
                 )
-            )
         })
     }
 
@@ -178,8 +177,8 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun displaySummary(tracks: List<Track>) {
         val count = tracks.size
         val totalDistance = tracks.sumByDouble { it.distance.toDouble() }
-        val totalTime = tracks.sumBy {
-            it.timeDifference?.takeIf { it.isNotEmpty() }?.let { difference ->
+        val totalTime = tracks.sumBy { track ->
+            track.timeDifference?.takeIf { it.isNotEmpty() }?.let { difference ->
                 val chunks = difference.split(" ")
                 val hours = chunks[0].removeSuffix("h").toIntOrNull() ?: 0
                 val minutes = chunks[1].removeSuffix("m").toIntOrNull() ?: 0
@@ -187,9 +186,9 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 hours * 60 * 60 + minutes * 60 + seconds
             } ?: 0
         }
-        sum_count.setText("$count")
-        sum_distance.setText(getString(R.string.distance_format, totalDistance))
-        sum_time.setText("${DateTimeUtils.getFormattedTime(totalTime)}")
+        sum_count.text = "$count"
+        sum_distance.text = getString(R.string.distance_format, totalDistance)
+        sum_time.text = DateTimeUtils.getFormattedTime(totalTime)
     }
 
     private fun startTracking(trackId: Long) {
@@ -241,14 +240,12 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
             AlertDialog.Builder(context)
                 .setMessage(getString(R.string.delete_message, track.label))
                 .setNegativeButton(R.string.delete_no, null)
-                .setPositiveButton(R.string.delete_yes, object: DialogInterface.OnClickListener{
-                    override fun onClick(dialog: DialogInterface?, which: Int) {
-                        track.id?.let { trackId ->
-                            tracksViewModel.deleteTrack(trackId)
-                            tracksViewModel.fetchTracks()
-                        }
+                .setPositiveButton(R.string.delete_yes) { _, _ ->
+                    track.id?.let { trackId ->
+                        tracksViewModel.deleteTrack(trackId)
+                        tracksViewModel.fetchTracks()
                     }
-                })
+                }
                 .show()
         }
     }

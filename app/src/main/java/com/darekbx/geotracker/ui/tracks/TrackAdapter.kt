@@ -99,5 +99,5 @@ class TrackAdapter(val context: Context?)
 
     override fun isChildSelectable(groupPosition: Int, childPosition: Int) = false
 
-    val inflater by lazy { LayoutInflater.from(context) }
+    private val inflater: LayoutInflater by lazy { LayoutInflater.from(context) }
 }

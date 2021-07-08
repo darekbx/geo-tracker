@@ -35,6 +35,7 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
     private val backgroundColor = Color.argb(10, 0, 0, 0)
     private val leftPadding = 96F
     private val topPadding = 18F
+    private val zoomCount = 20
 
     private var zoomPosition: Float? = null
 
@@ -47,7 +48,7 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_MOVE, MotionEvent.ACTION_DOWN -> {
-                zoomPosition = event?.x
+                zoomPosition = event.x
                 invalidate()
                 return true
             }
@@ -62,7 +63,7 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        canvas?.let { canvas ->
+        canvas?.let {
 
             canvas.drawColor(backgroundColor)
 
@@ -70,15 +71,15 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
                 return
             }
 
-            val height = getHeight() - topPadding
-            val width = getWidth() - leftPadding
+            val height = height - topPadding
+            val width = width - leftPadding
 
             val count = values.count()
             val maxValue = (values.max() ?: 1.0F)
             val avgValue = values.average().toFloat()
             val widthRatio = width / count.toFloat()
             val heightRatio = height / maxValue
-            var firstPoint = PointF(leftPadding, height - (values.first() * heightRatio))
+            val firstPoint = PointF(leftPadding, height - (values.first() * heightRatio))
             val maxPosition = topPadding + (height - (maxValue * heightRatio))
             val avgPosition = topPadding + (height - (avgValue * heightRatio))
 
@@ -97,11 +98,10 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
     ) {
         zoomPosition?.let {
 
-            val height = getHeight().toFloat()
-            val zoomCount = 20
+            val height = height.toFloat()
             val position = (it / widthRatio).toInt()
 
-            if (zoomNotAvailable(zoomCount, position)) {
+            if (zoomNotAvailable(position)) {
                 return
             }
 
@@ -114,7 +114,7 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
             val zoomAreaStart = it - ((zoomCount / 2) * zoomWidthRatio)
             val zoomAreaEnd = it + ((zoomCount / 2) * zoomWidthRatio)
 
-            var zoomFirstPoint = PointF(zoomAreaStart, height - (zoomValues.first() * heightRatio))
+            val zoomFirstPoint = PointF(zoomAreaStart, height - (zoomValues.first() * heightRatio))
 
             canvas.drawRect(
                 zoomAreaStart,
@@ -169,13 +169,13 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
         }
     }
 
-    private fun zoomNotAvailable(zoomCount: Int, position: Int) =
+    private fun zoomNotAvailable(position: Int) =
         values.size < zoomCount * 2
                 || position < zoomCount
                 || position + zoomCount >= values.size
 
     private fun drawGuide(canvas: Canvas, guideLinePosition: Float, value: Float) {
-        canvas.drawLine(leftPadding, guideLinePosition, getWidth().toFloat(), guideLinePosition, guidePaint)
+        canvas.drawLine(leftPadding, guideLinePosition, width.toFloat(), guideLinePosition, guidePaint)
         canvas.drawText("${(value * 3.6F).toInt()}km\\h", 6F, guideLinePosition + 7F, textPaint)
     }
 }

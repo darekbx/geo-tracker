@@ -42,7 +42,7 @@ class SaveTrackDialog : DialogFragment(R.layout.dialog_track_label) {
     private fun validateLabelAndSave() {
         val label = input_label.text.toString()
         when (TextUtils.isEmpty(label)) {
-            true -> input_label.setError(getString(R.string.empty_label_validation))
+            true -> input_label.error = getString(R.string.empty_label_validation)
             else -> {
                 saveCallback?.invoke(input_label.text.toString())
                 dismiss()

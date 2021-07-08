@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 
 class PermissionRequester(
     val activity: FragmentActivity?,
-    val permissions: Array<String>,
+    private val permissions: Array<String>,
     val onDenied: () -> Unit = { }
 ) {
 

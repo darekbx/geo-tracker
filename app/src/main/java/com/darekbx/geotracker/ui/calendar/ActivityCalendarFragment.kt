@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.calendar
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -19,19 +20,21 @@ import com.kizitonwose.calendarview.ui.MonthHeaderFooterBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_activity_calendar.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.DayOfWeek
 import java.time.YearMonth
 import java.util.Calendar
 
 class DayViewContainer(view: View) : ViewContainer(view) {
-    val dayTextView = view.findViewById<TextView>(R.id.calendarDayText)
-    val kilometersTextView = view.findViewById<TextView>(R.id.calendarDayKilometersText)
+    val dayTextView: TextView = view.findViewById(R.id.calendarDayText)
+    val kilometersTextView: TextView = view.findViewById(R.id.calendarDayKilometersText)
 }
 
 class MonthHeaderContainer(view: View) : ViewContainer(view) {
-    val textView = view.findViewById<TextView>(R.id.calendarMonthHeaderText)
+    val textView: TextView = view.findViewById(R.id.calendarMonthHeaderText)
 }
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
 
@@ -96,6 +99,7 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
             container.kilometersTextView.text = ""
         }
 
+        @SuppressLint("SetTextI18n")
         private fun markOnBikeDay(
             day: CalendarDay,
             container: DayViewContainer
@@ -108,7 +112,7 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
             if (daySummary != null && daySummary.sumDistance > 0) {
                 val color = obtainColor(daySummary.sumDistance)
                 container.dayTextView.setBackgroundColor(color)
-                container.kilometersTextView.setText("%.2fkm".format(daySummary.sumDistance))
+                container.kilometersTextView.text = "%.2fkm".format(daySummary.sumDistance)
             } else {
                 reset(container)
             }
@@ -136,6 +140,7 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
 
             override fun create(view: View) = MonthHeaderContainer(view)
 
+            @SuppressLint("SetTextI18n")
             override fun bind(container: MonthHeaderContainer, month: CalendarMonth) {
                 val monthName = month.yearMonth.month.name
                 val paddedMonth = month.month.toString().padStart(2, '0')
@@ -145,7 +150,7 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
 
                 if (monthSummariesCount > 0) {
                     val monthDistance = monthSummaries.sumByDouble { it.sumDistance }
-                    container.textView.text = "$monthName, %.2fkm, ${monthSummariesCount} entries"
+                    container.textView.text = "$monthName, %.2fkm, $monthSummariesCount entries"
                         .format(monthDistance)
                 } else {
                     container.textView.text = monthName

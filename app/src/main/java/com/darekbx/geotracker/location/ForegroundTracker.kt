@@ -2,6 +2,7 @@ package com.darekbx.geotracker.location
 
 import android.annotation.SuppressLint
 import android.app.*
+import android.app.PendingIntent.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -22,26 +23,24 @@ import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.utils.DateTimeUtils
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ForegroundTracker : Service() {
 
     companion object {
-        val TRACK_ID_KEY = "track_id_key"
-        val NOTIFICATION_ID = 100
-        val NOTIFICATION_CHANNEL_ID = "location_channel_id"
+        const val TRACK_ID_KEY = "track_id_key"
+        const val NOTIFICATION_ID = 100
+        const val NOTIFICATION_CHANNEL_ID = "location_channel_id"
 
         var IS_RUNNING = false
     }
 
     private val viewModelJob = SupervisorJob()
 
-    protected val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
+    private val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     @Inject
     lateinit var appPreferences: AppPreferences
@@ -61,7 +60,7 @@ class ForegroundTracker : Service() {
     private var lastSessionDistance = 0.0F
     private var lastLocation: Location? = null
 
-    override fun onBind(p0: Intent?) = null
+    override fun onBind(p0: Intent?): Nothing? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -76,7 +75,7 @@ class ForegroundTracker : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        locationManager?.removeUpdates(locationListener)
+        locationManager.removeUpdates(locationListener)
         IS_RUNNING = false
         Log.v(GeoTrackerApplication.LOG_TAG, "Service was destroyed!")
     }
@@ -87,15 +86,13 @@ class ForegroundTracker : Service() {
             return super.onStartCommand(intent, flags, startId)
         }
 
-        intent?.let { intent ->
-            intent
-                ?.getLongExtra(TRACK_ID_KEY, -1L)
-                ?.takeIf { it > 0 }
-                ?.let { trackId ->
-                    this@ForegroundTracker.trackId = trackId
-                    startLocationUpdates()
-                }
-        }
+        intent
+            ?.getLongExtra(TRACK_ID_KEY, -1L)
+            ?.takeIf { it > 0 }
+            ?.let { trackId ->
+                this@ForegroundTracker.trackId = trackId
+                startLocationUpdates()
+            }
 
         return START_STICKY
     }
@@ -115,17 +112,15 @@ class ForegroundTracker : Service() {
         )
     }
 
-    private val locationListener = object : LocationListener {
-        override fun onLocationChanged(location: Location) {
-            Log.v(GeoTrackerApplication.LOG_TAG, "Received location update: $location")
-            trackId?.let { trackId ->
-                ioScope.launch {
-                    addPoint(trackId, location)
-                    appendDistance(location, trackId)
-                }
-                if (liveTrackerEnabled) {
-                    notifyLiveLocation(location, trackId)
-                }
+    private val locationListener = LocationListener { location ->
+        Log.v(GeoTrackerApplication.LOG_TAG, "Received location update: $location")
+        trackId?.let { trackId ->
+            ioScope.launch {
+                addPoint(trackId, location)
+                appendDistance(location, trackId)
+            }
+            if (liveTrackerEnabled) {
+                notifyLiveLocation(location, trackId)
             }
         }
     }
@@ -181,10 +176,12 @@ class ForegroundTracker : Service() {
         }
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
+    @ExperimentalCoroutinesApi
     private fun createNotification(title: String, text: String): Notification {
 
         val stopIntent = Intent(TracksFragment.STOP_ACTION)
-        val stopPendingIntent = PendingIntent.getBroadcast(applicationContext, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val stopPendingIntent = getBroadcast(applicationContext, 0, stopIntent, FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_myplaces)

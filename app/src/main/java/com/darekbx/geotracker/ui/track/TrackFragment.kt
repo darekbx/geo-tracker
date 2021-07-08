@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.track
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
@@ -77,7 +78,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     private fun notifyFixed() {
         AlertDialog.Builder(requireContext())
             .setMessage(R.string.track_was_fixed)
-            .setPositiveButton(R.string.button_ok, { _, _ -> loadTrack() })
+            .setPositiveButton(R.string.button_ok) { _, _ -> loadTrack() }
             .show()
     }
 
@@ -92,7 +93,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         AlertDialog.Builder(requireContext())
             .setTitle(R.string.delete_points_title)
             .setMessage(R.string.delete_points_success)
-            .setPositiveButton(R.string.button_ok, { _, _ -> loadTrack() })
+            .setPositiveButton(R.string.button_ok) { _, _ -> loadTrack() }
             .show()
     }
 
@@ -132,6 +133,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         map.setMultiTouchControls(true)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun displayTrack(track: Track) {
         val label = when (TextUtils.isEmpty(track.label)) {
             true -> getString(R.string.empty)
