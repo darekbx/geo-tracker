@@ -36,14 +36,17 @@ class TrackViewModel @ViewModelInject constructor(
     var pointsDeleteResult = MutableLiveData<Boolean>()
     var fixResult = MutableLiveData<Boolean>()
     var progress = MutableLiveData<Progress>()
+    var trackLoadingStatus = MutableLiveData<Boolean>()
 
     @ExperimentalCoroutinesApi
     fun fetchTracks() {
+        trackLoadingStatus.postValue(true)
         viewModelScope.launch {
             val tracksList = tracksFlow().toList()
             val yearTracks =
                 tracksList.groupBy { it.startTimestamp?.take(4) /* group by year, take 'yyyy' from 'yyyy-MM-dd HH:mm' date format */ }
             tracks.postValue(yearTracks)
+            trackLoadingStatus.postValue(false)
         }
     }
 

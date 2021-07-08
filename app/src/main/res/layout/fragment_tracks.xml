@@ -105,12 +105,34 @@
     TODO: fix ExpandableListView height in CoordinatorLayout
 
     -->
-    <ExpandableListView
-        android:id="@+id/tracks_list"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="618dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <ExpandableListView
+            android:id="@+id/tracks_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+        <FrameLayout
+            android:id="@+id/loading_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#6000"
+            android:visibility="gone"
+            >
+            <ProgressBar
+                android:id="@+id/progress_view"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:indeterminate="false"
+                android:progressDrawable="@drawable/circular_progress_bar"
+                android:max="100"
+                android:progress="50"
+                />
+        </FrameLayout>
+    </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/status_container"

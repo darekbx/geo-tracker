@@ -128,6 +128,10 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         tracksViewModel.updateResult.observe(viewLifecycleOwner, Observer {
             setUIMode(isRecording = false)
         })
+
+        tracksViewModel.trackLoadingStatus.observe(viewLifecycleOwner, Observer { isLoading ->
+            loading_view.visibility = if (isLoading) View.VISIBLE else View.GONE
+        })
     }
 
     private fun handleStopRecordActions() {
