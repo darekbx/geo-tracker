@@ -40,6 +40,10 @@
     <string name="track_was_fixed">Track endTimestamp was fixed.</string>
     <string name="exit_while_recording">Exit app while recording?</string>
     <string name="wait_for"><![CDATA[Wait for <b>%ds</b>]]></string>
+    <string name="seek_start">Start</string>
+    <string name="seek_end">End</string>
+    <string name="seek_summary">Overall points: %d, after cut: %d</string>
+    <string name="delete_success">Points were deleted</string>
 
     <string name="settings_gps_category">Settings</string>
     <string name="settings_interval_dialog_title">Minimum interval</string>

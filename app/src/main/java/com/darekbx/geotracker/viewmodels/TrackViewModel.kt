@@ -8,6 +8,7 @@ import com.darekbx.geotracker.model.RecordStatus
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.PointDao
 import com.darekbx.geotracker.repository.TrackDao
+import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.geotracker.repository.entities.TrackPoints
 import com.darekbx.geotracker.utils.AppPreferences
@@ -24,6 +25,8 @@ class TrackViewModel @ViewModelInject constructor(
     private val pointDao: PointDao,
     private val appPreferences: AppPreferences
 ) : BaseViewModel() {
+
+    data class PointScope(val idFrom: Long, val idTo: Long)
 
     companion object {
         const val ONE_KILOMETER = 1000.0F // [meters]
@@ -81,6 +84,25 @@ class TrackViewModel @ViewModelInject constructor(
         }
     }
 
+    fun deleteTrackPoints(trackId: Long, startPoints: List<PointDto>, endPoints: List<PointDto>) {
+        ioScope.launch {
+            val pointScopes = arrayOf(
+                createPointScope(startPoints),
+                createPointScope(endPoints)
+            )
+            for (scope in pointScopes) {
+                pointDao.deletePoints(trackId, scope.idFrom, scope.idTo)
+            }
+            pointsDeleteResult.postValue(true)
+        }
+    }
+
+    private fun createPointScope(points: List<PointDto>): TrackViewModel.PointScope {
+        val startId = points.mapNotNull { it.id }.minBy { it } ?: 0L
+        val endId = points.mapNotNull { it.id }.maxBy { it } ?: 0L
+        return PointScope(startId, endId)
+    }
+
     fun deleteTrack(trackId: Long) {
         ioScope.launch {
             trackDao.delete(trackId)
@@ -88,8 +110,7 @@ class TrackViewModel @ViewModelInject constructor(
         }
     }
 
-    fun fetchTracksWithPoints() = flow {
-        val nthPointsToSkip = appPreferences.nthPointsToSkip
+    fun fetchTracksWithPoints(nthPointsToSkip: Int = appPreferences.nthPointsToSkip) = flow {
         val tracksSize = trackDao.countAllTracks()
         var index = 0
         trackDao

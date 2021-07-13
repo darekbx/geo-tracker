@@ -18,6 +18,9 @@ interface PointDao {
     @Query("DELETE FROM point WHERE track_id = :trackId")
     fun deleteByTrack(trackId: Long)
 
+    @Query("DELETE FROM point WHERE track_id = :trackId AND id >= :idFrom AND id <= :idTo")
+    fun deletePoints(trackId: Long, idFrom: Long, idTo: Long)
+
     @Insert
     fun add(pointDto: PointDto)
 }

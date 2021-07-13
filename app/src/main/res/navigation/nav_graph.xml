@@ -26,6 +26,9 @@
         <action
             android:id="@+id/action_trackFragment_to_allTracksFragment"
             app:destination="@id/allTracksFragment" />
+        <action
+            android:id="@+id/action_trackFragment_to_trackEditorFragment"
+            app:destination="@id/trackEditorFragment" />
     </fragment>
     <fragment
         android:id="@+id/tracksFragment"
@@ -52,4 +55,8 @@
         android:id="@+id/activityCalendarFragment"
         android:name="com.darekbx.geotracker.ui.calendar.ActivityCalendarFragment"
         android:label="ActivityCalendarFragment" />
+    <fragment
+        android:id="@+id/trackEditorFragment"
+        android:name="com.darekbx.geotracker.ui.trackeditor.TrackEditorFragment"
+        android:label="TrackEditorFragment" />
 </navigation>

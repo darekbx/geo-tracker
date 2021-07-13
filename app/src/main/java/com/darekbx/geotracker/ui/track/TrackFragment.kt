@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -53,7 +54,9 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         image_label_edit.setOnClickListener { editLabel() }
         overlapping_button.setOnClickListener { displayOverlappingMap() }
         clear_points_button.setOnClickListener { confirmDeleteTrackPoints() }
+        clear_points_button.setOnClickListener { confirmDeleteTrackPoints() }
         fix_data_button.setOnClickListener { fixDate() }
+        edit_track_button.setOnClickListener { openTrackEditor() }
     }
 
     override fun onResume() {
@@ -80,6 +83,11 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             .setMessage(R.string.track_was_fixed)
             .setPositiveButton(R.string.button_ok) { _, _ -> loadTrack() }
             .show()
+    }
+
+    private fun openTrackEditor() {
+        findNavController()
+            .navigate(R.id.action_trackFragment_to_trackEditorFragment, arguments)
     }
 
     private fun fixDate() {
@@ -144,7 +152,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         value_end_time.text = track.endTimestamp ?: getString(R.string.empty)
         value_time.text = track.timeDifference
         value_distance.text = getString(R.string.distance_format, track.distance)
-        fix_data_button.visibility = if(track.isTimeBroken) View.VISIBLE else View.GONE
+        fix_data_button.isVisible = track.isTimeBroken
 
         if (track.points.isNotEmpty()) {
             displayFullTrackDetails(track)
@@ -153,6 +161,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             speed_view.values = emptyList()
             altitude_view.values = emptyList()
             map.visibility = View.INVISIBLE
+            edit_track_button.isVisible = false
         }
     }
 
