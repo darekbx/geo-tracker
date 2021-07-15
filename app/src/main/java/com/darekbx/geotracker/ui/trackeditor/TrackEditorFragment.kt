@@ -220,7 +220,7 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
         polyline.setPoints(mapPoints)
 
         binding.map.overlays.removeAll { it is Polyline && it.id == CUT_OVERLAY_ID }
-        binding.map.overlays.add(polyline)
+        binding.map.overlays.add(0, polyline)
         binding.map.invalidateMapCoordinates(binding.map.projection.screenRect)
     }
 
