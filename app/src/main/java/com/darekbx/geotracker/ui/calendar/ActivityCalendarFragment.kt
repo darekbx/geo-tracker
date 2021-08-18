@@ -85,17 +85,17 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
             container: DayViewContainer
         ) {
             if (day.owner == DayOwner.THIS_MONTH) {
-                container.dayTextView.setTextColor(Color.BLACK)
+                container.dayTextView.setTextColor(Color.WHITE)
                 markCurrentDay(day, container)
                 markOnBikeDay(day, container)
             } else {
-                container.dayTextView.setTextColor(Color.WHITE)
+                container.dayTextView.setTextColor(Color.DKGRAY)
                 reset(container)
             }
         }
 
         private fun reset(container: DayViewContainer) {
-            container.dayTextView.setBackgroundColor(Color.WHITE)
+            container.dayTextView.setBackgroundColor(Color.BLACK)
             container.kilometersTextView.text = ""
         }
 

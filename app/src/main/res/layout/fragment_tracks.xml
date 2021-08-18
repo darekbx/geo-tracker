@@ -9,7 +9,7 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="132dp"
+        android:layout_height="84dp"
         android:fitsSystemWindows="true"
         app:elevation="0dp">
 
@@ -24,26 +24,16 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="@dimen/padding_small"
-                app:layout_collapseMode="pin"
-                >
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:fitsSystemWindows="true"
-                    app:titleTextColor="#fff"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+                android:paddingStart="@dimen/padding_medium"
+                app:layout_collapseMode="pin">
 
                 <TextView
                     android:id="@+id/sum_distance_title"
-                    android:layout_width="100dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/toolbar"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginTop="@dimen/padding_medium"
                     android:text="@string/total_distance"
                     style="@style/summary_label"
                     />
@@ -51,49 +41,32 @@
                     android:id="@+id/sum_distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/toolbar"
-                    app:layout_constraintStart_toEndOf="@id/sum_distance_title"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/sum_distance_title"
                     tools:text="145.09km"
                     style="@style/summary_value"
-                    /> 
-                
+                    />
                 <TextView
-                    android:id="@+id/sum_time_title"
-                    android:layout_width="100dp"
+                    android:id="@+id/sum_in"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/sum_distance_title"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:text="@string/total_time"
-                    style="@style/summary_label"
+                    app:layout_constraintStart_toEndOf="@id/sum_distance"
+                    app:layout_constraintTop_toTopOf="@id/sum_distance"
+                    android:text="@string/total_in"
+                    android:paddingStart="@dimen/padding_small"
+                    android:paddingEnd="@dimen/padding_small"
+                    android:textSize="24sp"
                     />
                 <TextView
                     android:id="@+id/sum_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/sum_distance"
-                    app:layout_constraintStart_toEndOf="@id/sum_time_title"
+                    app:layout_constraintStart_toEndOf="@id/sum_in"
+                    app:layout_constraintTop_toTopOf="@id/sum_distance"
                     tools:text="5h 14m 6s"
                     style="@style/summary_value"
                     />
-                
-                <TextView
-                    android:id="@+id/sum_count_title"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/sum_time_title"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:text="@string/total_count"
-                    style="@style/summary_label"
-                    />
-                <TextView
-                    android:id="@+id/sum_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/sum_time"
-                    app:layout_constraintStart_toEndOf="@id/sum_count_title"
-                    tools:text="23"
-                    style="@style/summary_value"
-                    />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -135,10 +108,55 @@
     </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        >
+        <androidx.constraintlayout.widget.Placeholder
+            android:id="@+id/floating_placeholder_inner"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_margin="@dimen/padding_large"
+            />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_all_tracks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/floating_placeholder_inner"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/padding_large"
+            android:layout_marginBottom="@dimen/padding_medium"
+            android:src="@drawable/ic_all"
+            />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_calendar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/button_all_tracks"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/padding_large"
+            android:layout_marginBottom="@dimen/padding_medium"
+            android:src="@drawable/ic_calendar"
+            />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/button_calendar"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/padding_large"
+            android:layout_marginBottom="@dimen/padding_medium"
+            android:src="@drawable/ic_settings"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/status_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#DFFF"
+        android:background="#D000"
         android:visibility="gone"
         >
 
@@ -148,15 +166,15 @@
             android:layout_height="wrap_content"
             android:text="@string/recording_in_progress"
             android:textAlignment="center"
-            android:textColor="#000"
+            android:textColor="@android:color/white"
             android:textSize="28dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/center"
             />
-        <Space
+        <androidx.slidingpanelayout.widget.SlidingPaneLayout
             android:id="@+id/center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/padding_medium"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -198,6 +216,7 @@
             android:layout_margin="@dimen/padding_large"
             app:backgroundTint="@android:color/white"
             android:src="@drawable/ic_record"
+            android:translationZ="101dp"
             />
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/button_stop"
@@ -210,36 +229,7 @@
             android:src="@drawable/ic_stop"
             android:visibility="gone"
             />
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_all_tracks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/floating_placeholder"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="@dimen/padding_large"
-            android:layout_marginBottom="@dimen/padding_medium"
-            android:src="@drawable/ic_all"
-            />
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_calendar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/button_all_tracks"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="@dimen/padding_large"
-            android:layout_marginBottom="@dimen/padding_medium"
-            android:src="@drawable/ic_calendar"
-            />
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_settings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/button_calendar"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="@dimen/padding_large"
-            android:layout_marginBottom="@dimen/padding_medium"
-            android:src="@drawable/ic_settings"
-            />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

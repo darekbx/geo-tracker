@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="false">
         <shape android:shape="ring" android:thickness="1dp" android:useLevel="false">
-            <size android:width="8dp" android:height="8dp" />
+            <size android:width="12dp" android:height="12dp" />
             <solid android:color="@color/colorAccent" />
         </shape>
     </item>
@@ -10,11 +10,11 @@
         <layer-list>
             <item>
                 <shape android:shape="ring" android:thickness="1dp" android:useLevel="false">
-                    <size android:width="8dp" android:height="8dp" />
+                    <size android:width="12dp" android:height="12dp" />
                     <solid android:color="@color/colorAccent" />
                 </shape>
             </item>
-            <item android:width="4dp" android:height="4dp" android:gravity="center">
+            <item android:width="6dp" android:height="6dp" android:gravity="center">
                 <shape android:shape="oval">
                     <solid android:color="@color/colorAccent" />
                 </shape>

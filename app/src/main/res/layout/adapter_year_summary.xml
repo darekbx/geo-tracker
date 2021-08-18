@@ -12,29 +12,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/padding_small"
-        android:paddingTop="@dimen/padding_small">
-        <TextView
-            android:id="@+id/year_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:paddingStart="@dimen/padding_large"
-            android:text="@{yearSummary.year}"
-            android:textColor="@android:color/black"
-            tools:text="2020"
-            />
+        android:paddingTop="8dp">
         <TextView
             android:id="@+id/year_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/year_label"
-            android:paddingStart="@dimen/padding_medium"
-            android:text="@{@string/distance_format(yearSummary.totalDistance) + ` (` + yearSummary.totalCount + `)`}"
-            tools:text="10.56km (50)"
+            app:layout_constraintStart_toStartOf="parent"
+            android:paddingStart="52dp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="@{@string/distance_format(yearSummary.totalDistance+200)}"
+            tools:text="10.56km"
+            />
+        <TextView
+            android:id="@+id/year_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/year_distance"
+            android:paddingStart="@dimen/padding_small"
+            android:paddingEnd="@dimen/padding_medium"
+            android:text="@{`(` + yearSummary.totalCount + `)`}"
+            android:textSize="18sp"
+            tools:text="(50)"
+            />
+        <TextView
+            android:id="@+id/year_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingEnd="@dimen/padding_medium"
+            android:text="@{yearSummary.year}"
+            android:textSize="18sp"
+            tools:text="2020"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

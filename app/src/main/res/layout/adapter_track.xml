@@ -7,6 +7,13 @@
         <import type="android.view.View" />
         <variable name="track" type="com.darekbx.geotracker.model.Track" />
     </data>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp"
+        >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/row_container"
         android:layout_width="match_parent"
@@ -14,14 +21,15 @@
         android:paddingStart="@dimen/padding_medium"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:background="#1666">
+        android:background="@drawable/bg_round_corners">
 
         <CheckBox
             android:id="@+id/points_state"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:padding="0dp"
             android:checked="@{track.hasPoints()}"
+            android:enabled="false"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -32,16 +40,14 @@
             android:id="@+id/track_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/track_distance"
+            app:layout_constraintTop_toBottomOf="@id/track_time"
+            app:layout_constraintEnd_toEndOf="parent"
             android:gravity="start"
             android:ellipsize="end"
             android:paddingStart="@dimen/padding_medium"
-            android:paddingEnd="@dimen/padding_small"
+            android:paddingEnd="@dimen/padding_medium"
             android:text="@{track.label}"
-            android:textColor="@android:color/black"
             tools:text="Label"
             />
         <TextView
@@ -49,10 +55,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/track_time"
+            app:layout_constraintStart_toEndOf="@id/points_state"
             android:paddingEnd="@dimen/padding_small"
+            android:paddingStart="@dimen/padding_medium"
             android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
             android:text="@{@string/distance_format(track.distance)}"
             tools:text="10.56km"
             />
@@ -61,21 +69,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/track_duration"
-            android:paddingEnd="@dimen/padding_small"
+            app:layout_constraintBottom_toTopOf="@id/track_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingEnd="@dimen/padding_medium"
             android:text="@{track.startTimestamp}"
             tools:text="2020-05-25 12:00"
             app:isBroken="@{track.timeBroken}"
             />
         <TextView
             android:id="@+id/track_duration"
-            android:layout_width="90dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/track_distance"
+            app:layout_constraintStart_toEndOf="@id/points_state"
             android:paddingEnd="@dimen/padding_medium"
+            android:paddingStart="@dimen/padding_medium"
             android:text="@{track.timeDifference}"
+            android:textSize="16sp"
             tools:text="1h 15m 00s"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </layout>

@@ -13,26 +13,26 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
 
     private val chartPaint = Paint().apply {
         isAntiAlias = true
-        color = Color.RED
+        color = Color.GREEN
     }
 
     private val zoomBackgroundPaint = Paint().apply {
         isAntiAlias = true
-        color = Color.LTGRAY
+        color = Color.DKGRAY
     }
 
     private val guidePaint = Paint().apply {
-        isAntiAlias = true
-        color = Color.argb(50, 0, 0, 0)
+        isAntiAlias = false
+        strokeWidth = 1.0F
+        color = Color.argb(50, 255, 255, 255)
     }
 
     private val textPaint = Paint().apply {
         isAntiAlias = true
-        color = Color.BLACK
+        color = Color.WHITE
         textSize = 24.0F
     }
 
-    private val backgroundColor = Color.argb(10, 0, 0, 0)
     private val leftPadding = 96F
     private val topPadding = 18F
     private val zoomCount = 20
@@ -63,32 +63,28 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        canvas?.let {
 
-            canvas.drawColor(backgroundColor)
-
-            if (values.isEmpty()) {
-                return
-            }
-
-            val height = height - topPadding
-            val width = width - leftPadding
-
-            val count = values.count()
-            val maxValue = (values.max() ?: 1.0F)
-            val avgValue = values.average().toFloat()
-            val widthRatio = width / count.toFloat()
-            val heightRatio = height / maxValue
-            val firstPoint = PointF(leftPadding, height - (values.first() * heightRatio))
-            val maxPosition = topPadding + (height - (maxValue * heightRatio))
-            val avgPosition = topPadding + (height - (avgValue * heightRatio))
-
-            drawGuide(canvas, maxPosition, maxValue)
-            drawGuide(canvas, avgPosition, avgValue)
-            drawValues(widthRatio, height, heightRatio, canvas, firstPoint)
-
-            drawZoom(widthRatio, heightRatio, canvas)
+        if (values.isEmpty() || canvas == null) {
+            return
         }
+
+        val height = height - topPadding
+        val width = width - leftPadding
+
+        val count = values.count()
+        val maxValue = (values.max() ?: 1.0F)
+        val avgValue = values.average().toFloat()
+        val widthRatio = width / count.toFloat()
+        val heightRatio = height / maxValue
+        val firstPoint = PointF(leftPadding, height - (values.first() * heightRatio))
+        val maxPosition = topPadding + (height - (maxValue * heightRatio))
+        val avgPosition = topPadding + (height - (avgValue * heightRatio))
+
+        drawGuide(canvas, maxPosition, maxValue)
+        drawGuide(canvas, avgPosition, avgValue)
+        drawValues(widthRatio, height, heightRatio, canvas, firstPoint)
+
+        drawZoom(widthRatio, heightRatio, canvas)
     }
 
     private fun drawZoom(

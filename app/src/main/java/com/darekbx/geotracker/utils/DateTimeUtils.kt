@@ -19,6 +19,8 @@ object DateTimeUtils {
         val minutes = time / 60
         time %= 60
         val seconds = time
-        return "${hours}h ${minutes}m ${seconds}s"
+        return "${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
     }
+
+    private fun Int.pad() = toString().padStart(2, '0')
 }

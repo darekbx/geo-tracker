@@ -12,21 +12,21 @@ class AltitudeView(context: Context, attributeSet: AttributeSet) : View(context,
 
     private val chartPaint = Paint().apply {
         isAntiAlias = true
-        color = Color.RED
+        color = Color.GREEN
     }
 
     private val guidePaint = Paint().apply {
-        isAntiAlias = true
-        color = Color.argb(50, 0, 0, 0)
+        isAntiAlias = false
+        strokeWidth = 1.0F
+        color = Color.argb(50, 255, 255, 255)
     }
 
     private val textPaint = Paint().apply {
         isAntiAlias = true
-        color = Color.BLACK
+        color = Color.WHITE
         textSize = 24.0F
     }
 
-    private val backgroundColor = Color.argb(10, 0, 0, 0)
     private val leftPadding = 96F
     private val topPadding = 18F
 
@@ -38,29 +38,25 @@ class AltitudeView(context: Context, attributeSet: AttributeSet) : View(context,
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        canvas?.let {
 
-            canvas.drawColor(backgroundColor)
-
-            if (values.isEmpty()) {
-                return
-            }
-
-            val height = height - topPadding
-            val width = width - leftPadding
-
-            val count = values.count()
-            val maxValue = (values.max() ?: 1.0F)
-            val minValue = (values.min() ?: 1.0F)
-            val widthRatio = width / count.toFloat()
-            val heightRatio = height / (maxValue - minValue)
-            val firstPoint = PointF(leftPadding, height - ((values.first() - minValue) * heightRatio))
-            val maxPosition = topPadding + (height - ((maxValue - minValue) * heightRatio))
-
-            drawGuide(canvas, maxPosition, maxValue)
-            drawGuide(canvas, height, minValue)
-            drawValues(widthRatio, height, heightRatio, canvas, firstPoint, minValue)
+        if (values.isEmpty() || canvas == null) {
+            return
         }
+
+        val height = height - topPadding
+        val width = width - leftPadding
+
+        val count = values.count()
+        val maxValue = (values.max() ?: 1.0F)
+        val minValue = (values.min() ?: 1.0F)
+        val widthRatio = width / count.toFloat()
+        val heightRatio = height / (maxValue - minValue)
+        val firstPoint = PointF(leftPadding, height - ((values.first() - minValue) * heightRatio))
+        val maxPosition = topPadding + (height - ((maxValue - minValue) * heightRatio))
+
+        drawGuide(canvas, maxPosition, maxValue)
+        drawGuide(canvas, height, minValue)
+        drawValues(widthRatio, height, heightRatio, canvas, firstPoint, minValue)
     }
 
     private fun drawValues(

@@ -7,183 +7,223 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/value_label"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/label_container"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/value_label"
-        android:ellipsize="end"
-        android:padding="@dimen/padding_medium"
-        android:textSize="24sp"
-        android:textColor="@android:color/black"
-        tools:text="Label"
-        />
-    <ImageView
-        android:id="@+id/image_label_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/value_label"
-        app:layout_constraintBottom_toBottomOf="@id/value_label"
-        app:layout_constraintStart_toEndOf="@id/value_label"
-        android:src="@drawable/ic_edit"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/colorPrimary">
+        <TextView
+            android:id="@+id/value_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/value_label"
+            android:ellipsize="end"
+            android:padding="@dimen/padding_medium"
+            android:textSize="24sp"
+            android:textColor="@android:color/white"
+            tools:text="Label"
+            />
+        <TextView
+            android:id="@+id/value_label_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:ellipsize="end"
+            android:padding="@dimen/padding_tiny"
+            android:textSize="12sp"
+            tools:text="id: 3"
+            />
+        <ImageView
+            android:id="@+id/image_label_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/value_label"
+            app:layout_constraintBottom_toBottomOf="@id/value_label"
+            app:layout_constraintStart_toEndOf="@id/value_label"
+            android:src="@drawable/ic_edit"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Space
-        android:id="@+id/guide_line"
-        android:layout_width="1dp"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/value_label"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/summary_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/label_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="40dp"
-        />
+        android:layout_margin="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_medium"
+        android:paddingBottom="@dimen/padding_medium"
+        android:background="@drawable/bg_round_corners">
+        <TextView
+            android:id="@+id/label_trip_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/trip_time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingEnd="0dp"
+            />
 
-    <TextView
-        android:id="@+id/label_start_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/start_time"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/value_label"
-        android:paddingStart="@dimen/padding_medium"
-        android:paddingEnd="0dp"
-        />
-    <TextView
-        android:id="@+id/value_start_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="2020-05-25 13:00:00"
-        app:layout_constraintStart_toEndOf="@id/guide_line"
-        app:layout_constraintTop_toBottomOf="@id/value_label"
-        android:paddingEnd="@dimen/padding_medium"
-        android:paddingStart="0dp"
-        android:textColor="@android:color/black"
-        />
+        <TextView
+            android:id="@+id/value_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="2020-05-25"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/label_trip_time"
+            app:layout_constraintEnd_toStartOf="@id/label_trip_from"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintHorizontal_bias="0"
+            android:paddingEnd="@dimen/padding_tiny"
+            android:paddingStart="@dimen/padding_medium"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            />
+        <TextView
+            android:id="@+id/label_trip_from"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/trip_from"
+            app:layout_constraintBottom_toBottomOf="@id/value_date"
+            app:layout_constraintStart_toEndOf="@id/value_date"
+            app:layout_constraintEnd_toStartOf="@id/value_start_time"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:paddingEnd="@dimen/padding_tiny"
+            />
+        <TextView
+            android:id="@+id/value_start_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="13:00:00"
+            app:layout_constraintTop_toBottomOf="@id/label_trip_time"
+            app:layout_constraintStart_toEndOf="@id/label_trip_from"
+            app:layout_constraintEnd_toStartOf="@id/label_trip_to"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:paddingEnd="@dimen/padding_tiny"
+            android:paddingStart="0dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            />
+        <TextView
+            android:id="@+id/label_trip_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/trip_to"
+            app:layout_constraintBottom_toBottomOf="@id/value_date"
+            app:layout_constraintStart_toEndOf="@id/value_start_time"
+            app:layout_constraintEnd_toStartOf="@id/value_end_time"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:paddingEnd="@dimen/padding_tiny"
+            />
+        <TextView
+            android:id="@+id/value_end_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="16:00:00"
+            app:layout_constraintTop_toBottomOf="@id/label_trip_time"
+            app:layout_constraintStart_toEndOf="@id/label_trip_to"
+            app:layout_constraintEnd_toStartOf="@id/value_time"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:paddingEnd="@dimen/padding_tiny"
+            android:paddingStart="0dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            />
 
-    <TextView
-        android:id="@+id/label_end_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/end_time"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_start_time"
-        android:paddingStart="@dimen/padding_medium"
-        android:paddingEnd="0dp"
-        android:paddingTop="@dimen/padding_small"
-        />
-    <TextView
-        android:id="@+id/value_end_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="2020-05-25 13:00:00"
-        app:layout_constraintStart_toEndOf="@id/guide_line"
-        app:layout_constraintTop_toBottomOf="@id/label_start_time"
-        android:paddingEnd="@dimen/padding_medium"
-        android:paddingStart="0dp"
-        android:paddingTop="@dimen/padding_small"
-        android:textColor="@android:color/black"
-        />
+        <TextView
+            android:id="@+id/value_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="(1h 20m)"
+            app:layout_constraintBottom_toBottomOf="@id/value_date"
+            app:layout_constraintStart_toEndOf="@id/value_end_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/padding_medium"
+            />
 
-    <TextView
-        android:id="@+id/label_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/time"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_end_time"
-        android:paddingStart="@dimen/padding_medium"
-        android:paddingEnd="0dp"
-        android:paddingTop="@dimen/padding_small"
-        />
-    <TextView
-        android:id="@+id/value_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="1h 20m"
-        app:layout_constraintStart_toEndOf="@id/guide_line"
-        app:layout_constraintTop_toBottomOf="@id/label_end_time"
-        android:paddingEnd="@dimen/padding_medium"
-        android:paddingStart="0dp"
-        android:paddingTop="@dimen/padding_small"
-        android:textColor="@android:color/black"
-        />
+        <TextView
+            android:id="@+id/label_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/distance"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/value_date"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingTop="@dimen/padding_small"
+            />
+        <TextView
+            android:id="@+id/value_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="15.43km"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/label_distance"
+            android:paddingEnd="@dimen/padding_tiny"
+            android:paddingStart="@dimen/padding_medium"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            />
 
-    <TextView
-        android:id="@+id/label_distance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/distance"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_time"
-        android:paddingStart="@dimen/padding_medium"
-        android:paddingEnd="0dp"
-        android:paddingTop="@dimen/padding_small"
-        />
-    <TextView
-        android:id="@+id/value_distance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="15.43km"
-        app:layout_constraintStart_toEndOf="@id/guide_line"
-        app:layout_constraintTop_toBottomOf="@id/label_time"
-        android:paddingEnd="@dimen/padding_medium"
-        android:paddingStart="0dp"
-        android:paddingTop="@dimen/padding_small"
-        android:textColor="@android:color/black"
-        />
+        <TextView
+            android:id="@+id/value_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="(10 points)"
+            app:layout_constraintBottom_toBottomOf="@id/value_distance"
+            app:layout_constraintStart_toEndOf="@id/value_distance"
+            android:paddingEnd="@dimen/padding_medium"
+            android:paddingStart="0dp"
+            android:paddingTop="@dimen/padding_small"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/label_points"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/points"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_distance"
-        android:paddingStart="@dimen/padding_medium"
-        android:paddingEnd="0dp"
-        android:paddingTop="@dimen/padding_small"
-        />
-    <TextView
-        android:id="@+id/value_points"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="10"
-        app:layout_constraintStart_toEndOf="@id/guide_line"
-        app:layout_constraintTop_toBottomOf="@id/label_distance"
-        android:paddingEnd="@dimen/padding_medium"
-        android:paddingStart="0dp"
-        android:paddingTop="@dimen/padding_small"
-        android:textColor="@android:color/black"
-        />
-
-    <com.darekbx.geotracker.ui.track.SpeedView
-        android:id="@+id/speed_view"
+    <FrameLayout
+        android:id="@+id/speed_view_container"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        app:layout_constraintTop_toBottomOf="@id/value_points"
+        app:layout_constraintTop_toBottomOf="@id/summary_container"
+        app:layout_constraintBottom_toTopOf="@id/altitude_view_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="@dimen/padding_medium"
-        />
-    <com.darekbx.geotracker.ui.track.AltitudeView
-        android:id="@+id/altitude_view"
+        android:layout_margin="@dimen/padding_medium"
+        android:background="@drawable/bg_round_corners">
+        <com.darekbx.geotracker.ui.track.SpeedView
+            android:id="@+id/speed_view"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/altitude_view_container"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        app:layout_constraintTop_toBottomOf="@id/speed_view"
+        app:layout_constraintTop_toBottomOf="@id/speed_view_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="2dp"
-        />
+        android:layout_margin="@dimen/padding_medium"
+        android:background="@drawable/bg_round_corners">
+        <com.darekbx.geotracker.ui.track.AltitudeView
+            android:id="@+id/altitude_view"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            />
+    </FrameLayout>
 
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/altitude_view"
+        android:layout_marginTop="@dimen/padding_medium"
+        app:layout_constraintTop_toBottomOf="@id/altitude_view_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

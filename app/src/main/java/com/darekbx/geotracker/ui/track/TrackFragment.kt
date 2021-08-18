@@ -147,10 +147,20 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             true -> getString(R.string.empty)
             else -> track.label
         }
-        value_label.text = "$label (id: ${track.id})"
-        value_start_time.text = track.startTimestamp
-        value_end_time.text = track.endTimestamp ?: getString(R.string.empty)
-        value_time.text = track.timeDifference
+
+        val date = track.startTimestamp!!.split(" ")[0]
+        val startTime = track.startTimestamp!!.split(" ")[1]
+        val endTime = when {
+            track.endTimestamp == null -> getString(R.string.empty)
+            else -> track.endTimestamp.split(" ")[1]
+        }
+
+        value_label.text = label
+        value_label_id.text = "id: ${track.id}"
+        value_date.text = date
+        value_start_time.text = startTime
+        value_end_time.text = endTime
+        value_time.text = "(${track.timeDifference})"
         value_distance.text = getString(R.string.distance_format, track.distance)
         fix_data_button.isVisible = track.isTimeBroken
 
@@ -166,7 +176,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     }
 
     private fun displayFullTrackDetails(track: Track) {
-        value_points.text = "${track.points.size}"
+        value_points.text = getString(R.string.points, track.points.size)
         speed_view.values = track.points.map { it.speed }
         altitude_view.values = track.points.map { it.altitude.toFloat() }
 

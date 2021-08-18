@@ -53,7 +53,6 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
         collapsing_toolbar.setCollapsedTitleTextColor(Color.WHITE)
         collapsing_toolbar.setExpandedTitleColor(Color.WHITE)
-        toolbar.setTitle(R.string.app_name)
 
         registerViewModel()
         handleStopRecordActions()
@@ -175,7 +174,6 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     }
 
     private fun displaySummary(tracks: List<Track>) {
-        val count = tracks.size
         val totalDistance = tracks.sumByDouble { it.distance.toDouble() }
         val totalTime = tracks.sumBy { track ->
             track.timeDifference?.takeIf { it.isNotEmpty() }?.let { difference ->
@@ -186,7 +184,6 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 hours * 60 * 60 + minutes * 60 + seconds
             } ?: 0
         }
-        sum_count.text = "$count"
         sum_distance.text = getString(R.string.distance_format, totalDistance)
         sum_time.text = DateTimeUtils.getFormattedTime(totalTime)
     }
