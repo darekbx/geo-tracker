@@ -97,16 +97,17 @@ class TrackViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun createPointScope(points: List<PointDto>): TrackViewModel.PointScope {
+    private fun createPointScope(points: List<PointDto>): PointScope {
         val startId = points.mapNotNull { it.id }.minBy { it } ?: 0L
         val endId = points.mapNotNull { it.id }.maxBy { it } ?: 0L
         return PointScope(startId, endId)
     }
 
-    fun deleteTrack(trackId: Long) {
+    fun deleteTrack(trackId: Long, onCompleted: () -> Unit = { }) {
         ioScope.launch {
             trackDao.delete(trackId)
             pointDao.deleteByTrack(trackId)
+            onCompleted()
         }
     }
 
@@ -148,14 +149,17 @@ class TrackViewModel @ViewModelInject constructor(
                 ioScope.launch {
                     val track = trackDao.fetch(trackId)
                     val distance = (track?.distance ?: 0.0F) / ONE_KILOMETER
-                    val averageSpeed =
-                        if (points.size > 1) points.map { it.speed }.average().toFloat() else 0F
+                    val averageSpeed = if (points.size > 1) averageSpeed(points) else 0F
+                    val speed = if (points.isEmpty()) 0.0F else points.last().speed
                     val time = (System.currentTimeMillis() - (track?.startTimestamp ?: 0L)) / 1000
-                    postValue(RecordStatus(points.size, distance, averageSpeed, time))
+                    postValue(RecordStatus(points.size, distance, averageSpeed, speed, time))
                 }
             }
         }
     }
+
+    private fun averageSpeed(points: List<PointDto>) =
+        points.map { it.speed }.average().toFloat()
 
     fun updateTrack(trackId: Long, label: String?) {
         ioScope.launch {

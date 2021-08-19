@@ -1,9 +1,6 @@
 package com.darekbx.geotracker.ui.tracks
 
 import android.app.Dialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -18,19 +15,14 @@ class SaveTrackDialog : DialogFragment(R.layout.dialog_track_label) {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
-
-        val back = ColorDrawable(Color.WHITE)
-        val inset = InsetDrawable(back, 20)
-        dialog.window?.setBackgroundDrawable(inset)
         dialog.setCancelable(false)
         isCancelable = false
-
         return dialog
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Light_Dialog_MinWidth)
+        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Dialog_MinWidth)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

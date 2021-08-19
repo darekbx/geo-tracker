@@ -1,15 +1,18 @@
 package com.darekbx.geotracker.ui.settings
 
+import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.repository.AppDatabase
 import com.darekbx.geotracker.utils.AppPreferences
+import com.darekbx.geotracker.utils.PermissionRequester
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,13 +30,17 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
         findPreference<Preference>(getString(R.string.settings_backup_button_key))?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
-                makeBackup()
+                storagePermission.runWithPermission {
+                    makeBackup()
+                }
                 false
             }
 
         findPreference<Preference>(getString(R.string.settings_restore_button_key))
             ?.setOnPreferenceClickListener {
-                restoreDataFromBackup()
+                storagePermission.runWithPermission {
+                    restoreDataFromBackup()
+                }
                 false
             }
     }
@@ -113,5 +120,23 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun showPermissionsDeniedDialog() {
+        AlertDialog.Builder(requireContext())
+            .setMessage(R.string.permissions_are_required)
+            .setPositiveButton(R.string.button_ok, null)
+            .show()
+    }
+
+    private val storagePermission by lazy {
+        PermissionRequester(
+            activity,
+            arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ),
+            onDenied = { showPermissionsDeniedDialog() }
+        )
     }
 }

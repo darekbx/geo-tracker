@@ -149,7 +149,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         }
 
         val date = track.startTimestamp!!.split(" ")[0]
-        val startTime = track.startTimestamp!!.split(" ")[1]
+        val startTime = track.startTimestamp.split(" ")[1]
         val endTime = when {
             track.endTimestamp == null -> getString(R.string.empty)
             else -> track.endTimestamp.split(" ")[1]

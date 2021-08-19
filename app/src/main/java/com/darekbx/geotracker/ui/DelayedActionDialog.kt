@@ -1,9 +1,6 @@
 package com.darekbx.geotracker.ui
 
 import android.app.Dialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.Html
 import android.view.LayoutInflater
@@ -41,7 +38,7 @@ class DelayedActionDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Light_Dialog_MinWidth)
+        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Dialog_MinWidth)
     }
 
     override fun onCreateView(
@@ -55,13 +52,8 @@ class DelayedActionDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
-
-        val back = ColorDrawable(Color.WHITE)
-        val inset = InsetDrawable(back, 20)
-        dialog.window?.setBackgroundDrawable(inset)
         dialog.setCancelable(false)
         isCancelable = false
-
         return dialog
     }
 
@@ -82,7 +74,7 @@ class DelayedActionDialog : DialogFragment() {
         var time = 0L
         timer.scheduleAtFixedRate(timerTask {
             time += ONE_SECOND
-            updateConfirmButton(getString(R.string.wait_for, time), false)
+            updateConfirmButton(getString(R.string.wait_for, DELAY - time), false)
 
             if (time >= DELAY) {
                 updateConfirmButton(getString(R.string.button_confirm), true)

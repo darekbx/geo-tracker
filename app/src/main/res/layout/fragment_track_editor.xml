@@ -46,6 +46,7 @@
         app:layout_constraintEnd_toStartOf="@id/seek_start_value_label"
         app:layout_constraintTop_toTopOf="@id/seek_start_label"
         app:layout_constraintBottom_toBottomOf="@id/seek_start_label"
+        android:thumb="@drawable/bg_seekbar_thumb"
         tools:progress="59"
         />
     <TextView
@@ -81,6 +82,7 @@
         app:layout_constraintEnd_toStartOf="@id/seek_end_value_label"
         app:layout_constraintTop_toTopOf="@id/seek_end_label"
         app:layout_constraintBottom_toBottomOf="@id/seek_end_label"
+        android:thumb="@drawable/bg_seekbar_thumb"
         tools:progress="7"
         />
     <TextView

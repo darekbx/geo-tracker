@@ -21,7 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
-        android:textSize="12sp"
+        style="@style/default_label"
         tools:text="13.50km" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

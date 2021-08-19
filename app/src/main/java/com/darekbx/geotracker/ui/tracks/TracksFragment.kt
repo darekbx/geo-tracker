@@ -5,6 +5,8 @@ import android.content.*
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -77,6 +79,9 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         tracks_list.setAdapter(trackAdapter)
 
         activity?.registerReceiver(stopBroadcast, IntentFilter(STOP_ACTION))
+
+        val animation = AnimationUtils.loadAnimation(requireContext(), R.anim.anim_record_scale)
+        recording_animation.startAnimation(animation)
     }
 
     override fun onDestroyView() {
@@ -92,9 +97,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     override fun onResume() {
         super.onResume()
-        context?.let { context ->
-            checkLocationEnabled(context)
-        }
+        checkLocationEnabled(requireContext())
     }
 
     private fun checkLocationEnabled(context: Context) {
@@ -136,8 +139,10 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun handleStopRecordActions() {
         button_record.setOnClickListener {
             fineLocation.runWithPermission {
-                setUIMode(isRecording = true)
-                tracksViewModel.createNewTrack()
+                backgroudLocation.runWithPermission {
+                    setUIMode(isRecording = true)
+                    tracksViewModel.createNewTrack()
+                }
             }
         }
 
@@ -157,14 +162,10 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun observePointsChanges() {
         tracksViewModel.recordStatus?.observe(viewLifecycleOwner, Observer { recordStatus ->
-            recording_status.text =
-                getString(
-                    R.string.points_format,
-                    recordStatus.pointsCount,
-                    recordStatus.distance,
-                    (recordStatus.averageSpeed * 3.6F),
-                    DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
-                )
+            distance_value.text = getString(R.string.distance_format, recordStatus.distance)
+            speed_value.text = getString(R.string.speed_format, recordStatus.speed * 3.6F)
+            avg_speed_value.text = getString(R.string.speed_format, recordStatus.averageSpeed * 3.6F)
+            time_value.text = DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
         })
     }
 
@@ -216,12 +217,10 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     }
 
     private fun showPermissionsDeniedDialog() {
-        context?.let { context ->
-            AlertDialog.Builder(context)
-                .setMessage(R.string.permissions_are_required)
-                .setPositiveButton(R.string.button_ok, null)
-                .show()
-        }
+        AlertDialog.Builder(requireContext())
+            .setMessage(R.string.permissions_are_required)
+            .setPositiveButton(R.string.button_ok, null)
+            .show()
     }
 
     private fun openTrack(trackId: Long) {
@@ -239,8 +238,9 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 .setNegativeButton(R.string.delete_no, null)
                 .setPositiveButton(R.string.delete_yes) { _, _ ->
                     track.id?.let { trackId ->
-                        tracksViewModel.deleteTrack(trackId)
-                        tracksViewModel.fetchTracks()
+                        tracksViewModel.deleteTrack(trackId) {
+                            tracksViewModel.fetchTracks()
+                        }
                     }
                 }
                 .show()
@@ -267,11 +267,18 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
             activity,
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            onDenied = { showPermissionsDeniedDialog() }
+        )
+    }
+
+    private val backgroudLocation by lazy {
+        PermissionRequester(
+            activity,
+            arrayOf(
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                Manifest.permission.FOREGROUND_SERVICE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                Manifest.permission.FOREGROUND_SERVICE
             ),
             onDenied = { showPermissionsDeniedDialog() }
         )

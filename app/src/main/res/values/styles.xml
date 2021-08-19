@@ -17,4 +17,13 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="default_label">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="default_label_value">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

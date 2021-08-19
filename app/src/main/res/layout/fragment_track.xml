@@ -35,8 +35,8 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:ellipsize="end"
-            android:padding="@dimen/padding_tiny"
-            android:textSize="12sp"
+            android:padding="@dimen/padding_small"
+            style="@style/default_label"
             tools:text="id: 3"
             />
         <ImageView
@@ -84,8 +84,7 @@
             app:layout_constraintHorizontal_bias="0"
             android:paddingEnd="@dimen/padding_tiny"
             android:paddingStart="@dimen/padding_medium"
-            android:textSize="18sp"
-            android:textColor="@android:color/white"
+            style="@style/default_label_value"
             />
         <TextView
             android:id="@+id/label_trip_from"
@@ -109,8 +108,7 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             android:paddingEnd="@dimen/padding_tiny"
             android:paddingStart="0dp"
-            android:textSize="18sp"
-            android:textColor="@android:color/white"
+            style="@style/default_label_value"
             />
         <TextView
             android:id="@+id/label_trip_to"
@@ -134,8 +132,7 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             android:paddingEnd="@dimen/padding_tiny"
             android:paddingStart="0dp"
-            android:textSize="18sp"
-            android:textColor="@android:color/white"
+            style="@style/default_label_value"
             />
 
         <TextView
@@ -168,8 +165,7 @@
             app:layout_constraintTop_toBottomOf="@id/label_distance"
             android:paddingEnd="@dimen/padding_tiny"
             android:paddingStart="@dimen/padding_medium"
-            android:textSize="18sp"
-            android:textColor="@android:color/white"
+            style="@style/default_label_value"
             />
 
         <TextView

@@ -15,7 +15,7 @@ import com.darekbx.geotracker.model.YearSummary
 @BindingAdapter("isBroken")
 fun View.isBroken(isBroken: Boolean) {
     if (isBroken) {
-        setBackgroundColor(Color.RED)
+        setBackgroundColor(Color.parseColor("#e53935"))
     }
 }
 
