@@ -5,7 +5,6 @@ import android.content.*
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -16,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.location.ForegroundTracker
+import com.darekbx.geotracker.location.ForegroundTracker.Companion.TRACK_ID_KEY
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.utils.DateTimeUtils
@@ -82,6 +82,8 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
         val animation = AnimationUtils.loadAnimation(requireContext(), R.anim.anim_record_scale)
         recording_animation.startAnimation(animation)
+
+        subscribeToActiveTrack()
     }
 
     override fun onDestroyView() {
@@ -98,6 +100,15 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     override fun onResume() {
         super.onResume()
         checkLocationEnabled(requireContext())
+    }
+
+    private fun subscribeToActiveTrack() {
+        activity?.intent?.extras?.getLong(TRACK_ID_KEY)?.let { trackId ->
+            setUIMode(isRecording = true)
+            tracksViewModel.subscribeToPoints(trackId)
+            currentTrackId = trackId
+            observePointsChanges()
+        }
     }
 
     private fun checkLocationEnabled(context: Context) {
@@ -139,7 +150,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun handleStopRecordActions() {
         button_record.setOnClickListener {
             fineLocation.runWithPermission {
-                backgroudLocation.runWithPermission {
+                backgroundLocation.runWithPermission {
                     setUIMode(isRecording = true)
                     tracksViewModel.createNewTrack()
                 }
@@ -191,7 +202,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun startTracking(trackId: Long) {
         val intent = Intent(context, ForegroundTracker::class.java).apply {
-            putExtra(ForegroundTracker.TRACK_ID_KEY, trackId)
+            putExtra(TRACK_ID_KEY, trackId)
         }
         context?.startForegroundService(intent)
     }
@@ -273,7 +284,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         )
     }
 
-    private val backgroudLocation by lazy {
+    private val backgroundLocation by lazy {
         PermissionRequester(
             activity,
             arrayOf(

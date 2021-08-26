@@ -8,19 +8,29 @@ import androidx.appcompat.app.AppCompatActivity
 import com.darekbx.geotracker.ActivityTranstionReceiver
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.location.ForegroundTracker
-import com.google.android.gms.location.*
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.ActivityTransitionRequest
+import com.google.android.gms.location.ActivityRecognition
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
+    companion object {
+        val TAG = "MainActivity"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        registerActivityDetection()
+    }
 
+    private fun registerActivityDetection() {
         val transitions = listOf<ActivityTransition>(
             ActivityTransition.Builder()
                 .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-                .setActivityType(DetectedActivity.ON_BICYCLE)
+                .setActivityType(DetectedActivity.IN_VEHICLE)
                 .build()
         )
 
@@ -34,8 +44,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
         val task = ActivityRecognition.getClient(applicationContext)
             .requestActivityTransitionUpdates(transitionRequest, pendingIntent)
-        task.addOnSuccessListener { Log.d("-------", "Transitions reqested") }
-        task.addOnFailureListener { Log.e("-------", "Unable to request transitions $it") }
+        task.addOnSuccessListener { Log.d(TAG, "Transitions reqested") }
+        task.addOnFailureListener { Log.e(TAG, "Unable to request transitions $it") }
     }
 
     override fun onBackPressed() {

@@ -18,6 +18,8 @@ import com.darekbx.geotracker.model.LiveLocation
 import com.darekbx.geotracker.repository.PointDao
 import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.PointDto
+import com.darekbx.geotracker.repository.entities.TrackDto
+import com.darekbx.geotracker.ui.MainActivity
 import com.darekbx.geotracker.ui.tracks.TracksFragment
 import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.utils.DateTimeUtils
@@ -92,9 +94,22 @@ class ForegroundTracker : Service() {
             ?.let { trackId ->
                 this@ForegroundTracker.trackId = trackId
                 startLocationUpdates()
-            }
+            } ?: createTrackIdAndStart()
 
         return START_STICKY
+    }
+
+    private fun createTrackIdAndStart() {
+        ioScope.launch {
+            val track = TrackDto(
+                startTimestamp = System.currentTimeMillis(),
+                distance = 0.0F
+            )
+            this@ForegroundTracker.trackId = trackDao.add(track)
+            withContext(Dispatchers.Main) {
+                startLocationUpdates()
+            }
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -181,12 +196,20 @@ class ForegroundTracker : Service() {
     private fun createNotification(title: String, text: String): Notification {
 
         val stopIntent = Intent(TracksFragment.STOP_ACTION)
-        val stopPendingIntent = getBroadcast(applicationContext, 0, stopIntent, FLAG_UPDATE_CURRENT)
+        val stopPendingIntent = getBroadcast(applicationContext, 0,
+            stopIntent, FLAG_UPDATE_CURRENT)
+
+        val tracksIntent = Intent(applicationContext, MainActivity::class.java).apply {
+            putExtra(TRACK_ID_KEY, trackId)
+        }
+        val tracksPendingIntent = getActivity(applicationContext, 0,
+            tracksIntent, FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_myplaces)
             .setContentTitle(title)
             .setContentText(text)
+            .setContentIntent(tracksPendingIntent)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

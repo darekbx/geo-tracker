@@ -32,9 +32,10 @@
 
         <receiver
             android:name=".ActivityTranstionReceiver"
+            android:exported="true"
             android:permission="com.google.android.gms.permission.ACTIVITY_RECOGNITION">
             <intent-filter>
-                <action android:name="newAction"/>
+                <action android:name="OnBicycleActivityAction"/>
             </intent-filter>
         </receiver>
 
