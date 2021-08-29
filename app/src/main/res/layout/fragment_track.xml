@@ -209,7 +209,7 @@
         android:background="@drawable/bg_round_corners">
         <com.darekbx.geotracker.ui.track.AltitudeView
             android:id="@+id/altitude_view"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="60dp"
             />
     </FrameLayout>

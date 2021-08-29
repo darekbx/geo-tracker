@@ -2,17 +2,19 @@
 <navigation
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/splashFragment">
 
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.darekbx.geotracker.ui.settings.SettingsFragment"
-        android:label="SettingsFragment" />
+        android:label="SettingsFragment"/>
     <fragment
         android:id="@+id/splashFragment"
         android:name="com.darekbx.geotracker.ui.splash.SplashFragment"
-        android:label="SplashFragment" >
+        android:label="SplashFragment"
+        tools:layout="@layout/fragment_splash">
         <action
             android:id="@+id/action_splashFragment_to_tracksFragment"
             app:destination="@id/tracksFragment"
@@ -22,7 +24,8 @@
     <fragment
         android:id="@+id/trackFragment"
         android:name="com.darekbx.geotracker.ui.track.TrackFragment"
-        android:label="TrackFragment" >
+        android:label="TrackFragment"
+        tools:layout="@layout/fragment_track">
         <action
             android:id="@+id/action_trackFragment_to_allTracksFragment"
             app:destination="@id/allTracksFragment" />
@@ -33,7 +36,8 @@
     <fragment
         android:id="@+id/tracksFragment"
         android:name="com.darekbx.geotracker.ui.tracks.TracksFragment"
-        android:label="TracksFragment" >
+        android:label="TracksFragment"
+        tools:layout="@layout/fragment_tracks">
         <action
             android:id="@+id/action_tracksFragment_to_trackFragment"
             app:destination="@id/trackFragment" />
@@ -50,13 +54,16 @@
     <fragment
         android:id="@+id/allTracksFragment"
         android:name="com.darekbx.geotracker.ui.alltracks.AllTracksFragment"
-        android:label="AllTracksFragment" />
+        android:label="AllTracksFragment"
+        tools:layout="@layout/fragment_all_tracks" />
     <fragment
         android:id="@+id/activityCalendarFragment"
         android:name="com.darekbx.geotracker.ui.calendar.ActivityCalendarFragment"
-        android:label="ActivityCalendarFragment" />
+        android:label="ActivityCalendarFragment"
+        tools:layout="@layout/fragment_activity_calendar" />
     <fragment
         android:id="@+id/trackEditorFragment"
         android:name="com.darekbx.geotracker.ui.trackeditor.TrackEditorFragment"
-        android:label="TrackEditorFragment" />
+        android:label="TrackEditorFragment"
+        tools:layout="@layout/fragment_track_editor" />
 </navigation>

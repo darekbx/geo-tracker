@@ -74,15 +74,20 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 appPreferences.gpsUpdateInterval =
                     sharedPreferences?.getString(key, "$defaultValue")?.toLong() ?: defaultValue
             }
-            AppPreferences.LIVE_TRACKING_KEY -> {
-                val defaultValue = resources.getBoolean(R.bool.default_live_tracking)
-                appPreferences.liveTracking =
+            AppPreferences.ACTIVITY_DETECTION_KEY -> {
+                val defaultValue = resources.getBoolean(R.bool.default_activity_detection)
+                appPreferences.activityDetection =
                     sharedPreferences?.getBoolean(key, defaultValue) ?: defaultValue
             }
             AppPreferences.NTH_POINTS_TO_SKIP -> {
                 val defaultValue = resources.getInteger(R.integer.default_nth_points_to_skip)
                 appPreferences.nthPointsToSkip =
                     sharedPreferences?.getString(key, "$defaultValue")?.toInt() ?: defaultValue
+            }
+            AppPreferences.LIVE_TRACKING_KEY -> {
+                val defaultValue = resources.getBoolean(R.bool.default_live_tracking)
+                appPreferences.liveTracking =
+                    sharedPreferences?.getBoolean(key, defaultValue) ?: defaultValue
             }
         }
     }

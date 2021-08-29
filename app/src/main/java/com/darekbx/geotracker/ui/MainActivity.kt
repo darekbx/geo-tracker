@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         val transitions = listOf<ActivityTransition>(
             ActivityTransition.Builder()
                 .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-                .setActivityType(DetectedActivity.IN_VEHICLE)
+                .setActivityType(DetectedActivity.ON_BICYCLE)
                 .build()
         )
 

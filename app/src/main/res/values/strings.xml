@@ -59,6 +59,8 @@
     <string name="settings_nth_points_to_skip">Nth points to skip</string>
     <string name="settings_nth_points_to_skip_title">Skip rows to increase performance when displaying all tracks on map</string>
     <string name="settings_live_tracking_title">Live tracking</string>
+    <string name="settings_activity_detection">Activity detection</string>
+    <string name="settings_activity_detection_summary">Start tracking when detected on bicycle</string>
     <string name="settings_backup_button_title">Make backup</string>
     <string name="settings_backup_button_key">backup_button</string>
     <string name="settings_restore_button_title">Restore data from backup</string>

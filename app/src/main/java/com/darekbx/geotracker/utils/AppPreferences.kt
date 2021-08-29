@@ -13,6 +13,7 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
         const val GPS_MIN_DISTANCE_KEY = "gps_min_distance_key"
         const val NOTIFICATION_MIN_DISTANCE_KEY = "notification_min_distance"
         const val LIVE_TRACKING_KEY = "live_tracking"
+        const val ACTIVITY_DETECTION_KEY = "activity_detection"
         const val NTH_POINTS_TO_SKIP = "nth_points_to_skip"
     }
 
@@ -60,6 +61,15 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
         }
         set(value) {
             preferences.edit().putBoolean(LIVE_TRACKING_KEY, value).apply()
+        }
+
+    var activityDetection: Boolean
+        get() {
+            val defaultValue = context.resources.getBoolean(R.bool.default_activity_detection)
+            return preferences.getBoolean(ACTIVITY_DETECTION_KEY, defaultValue)
+        }
+        set(value) {
+            preferences.edit().putBoolean(ACTIVITY_DETECTION_KEY, value).apply()
         }
 
     private val preferences by lazy {

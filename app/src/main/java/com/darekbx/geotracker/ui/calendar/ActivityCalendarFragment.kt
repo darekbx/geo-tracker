@@ -119,10 +119,10 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
         }
 
         private fun obtainColor(sumDistance: Double) = when {
-            sumDistance > 0 && sumDistance <= 10 -> Color.argb(40, 40, 220, 80)
-            sumDistance > 10 && sumDistance <= 20 -> Color.argb(80, 40, 220, 80)
-            sumDistance > 20 && sumDistance <= 30 -> Color.argb(120, 40, 220, 80)
-            else -> Color.argb(160, 40, 220, 80)
+            sumDistance > 0 && sumDistance <= 10 -> Color.argb(60, 40, 220, 80)
+            sumDistance > 10 && sumDistance <= 20 -> Color.argb(100, 40, 220, 80)
+            sumDistance > 20 && sumDistance <= 30 -> Color.argb(140, 40, 220, 80)
+            else -> Color.argb(180, 40, 220, 80)
         }
 
         private fun markCurrentDay(

@@ -32,6 +32,13 @@
             android:summary="@string/settings_nth_points_to_skip_title"
             android:defaultValue="@integer/default_nth_points_to_skip"
             />
+        <CheckBoxPreference
+            android:key="activity_detection"
+            android:title="@string/settings_activity_detection"
+            android:summary="@string/settings_activity_detection_summary"
+            android:defaultValue="@bool/default_activity_detection"
+            app:useSimpleSummaryProvider="true"
+            />
         <!-- Live tracker url is not defined in gradle //-->
         <CheckBoxPreference
             android:key="live_tracking"
