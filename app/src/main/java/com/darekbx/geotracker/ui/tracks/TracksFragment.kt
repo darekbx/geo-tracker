@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.location.ForegroundTracker
 import com.darekbx.geotracker.location.ForegroundTracker.Companion.TRACK_ID_KEY
@@ -25,7 +24,6 @@ import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracks.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
@@ -34,9 +32,6 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     companion object {
         const val STOP_ACTION = "stop_action"
     }
-
-    @Inject
-    lateinit var appPreferences: AppPreferences
 
     private val tracksViewModel: TrackViewModel by viewModels()
 
@@ -186,7 +181,10 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     }
 
     private fun displaySummary(tracks: List<Track>) {
-        val totalDistance = tracks.sumByDouble { it.distance.toDouble() }
+        var totalDistance = 0.0F
+        for (track in tracks) {
+            totalDistance += track.distance
+        }
         val totalTime = tracks.sumBy { track ->
             track.timeDifference?.takeIf { it.isNotEmpty() }?.let { difference ->
                 val chunks = difference.split(" ")

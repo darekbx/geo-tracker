@@ -63,11 +63,15 @@ class TrackAdapter(val context: Context?)
     ): View {
         val binding = AdapterYearSummaryBinding.inflate(inflater, parent, false)
         getGroup(groupPosition)?.let { tracks ->
+            var totalDistance = 0.0F
+            for (track in tracks) {
+                totalDistance += track.distance
+            }
             val key = items.keys.elementAt(groupPosition)
             val yearSummary = YearSummary(
                 key ?: "[Unknown]",
                 tracks.size,
-                tracks.sumByDouble { it.distance.toDouble() }.toFloat()
+                totalDistance
             )
             binding.yearSummary = yearSummary
             binding.executePendingBindings()

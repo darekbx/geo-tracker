@@ -22,7 +22,7 @@
             app:layout_constraintStart_toStartOf="parent"
             android:paddingStart="52dp"
             style="@style/default_label_value"
-            android:text="@{@string/distance_format(yearSummary.totalDistance+200)}"
+            android:text="@{@string/distance_format(yearSummary.totalDistance)}"
             tools:text="10.56km"
             />
         <TextView
