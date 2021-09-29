@@ -48,9 +48,6 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        collapsing_toolbar.setCollapsedTitleTextColor(Color.WHITE)
-        collapsing_toolbar.setExpandedTitleColor(Color.WHITE)
-
         registerViewModel()
         handleStopRecordActions()
 
@@ -69,6 +66,11 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         button_calendar.setOnClickListener {
             findNavController()
                 .navigate(R.id.action_tracksFragment_to_activityCalendarFragment)
+        }
+
+        button_places_to_visit.setOnClickListener {
+            findNavController()
+                .navigate(R.id.action_tracksFragment_to_placesToVisitFragment)
         }
 
         tracks_list.setAdapter(trackAdapter)

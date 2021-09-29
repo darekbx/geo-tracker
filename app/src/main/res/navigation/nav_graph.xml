@@ -50,6 +50,9 @@
         <action
             android:id="@+id/action_tracksFragment_to_activityCalendarFragment"
             app:destination="@id/activityCalendarFragment" />
+        <action
+            android:id="@+id/action_tracksFragment_to_placesToVisitFragment"
+            app:destination="@id/placesToVisitFragment" />
     </fragment>
     <fragment
         android:id="@+id/allTracksFragment"
@@ -66,4 +69,9 @@
         android:name="com.darekbx.geotracker.ui.trackeditor.TrackEditorFragment"
         android:label="TrackEditorFragment"
         tools:layout="@layout/fragment_track_editor" />
+    <fragment
+        android:id="@+id/placesToVisitFragment"
+        android:name="com.darekbx.geotracker.ui.placestovisit.PlacesToVisitFragment"
+        android:label="PlacesToVisitFragment"
+        tools:layout="@layout/fragment_places_to_visit"/>
 </navigation>

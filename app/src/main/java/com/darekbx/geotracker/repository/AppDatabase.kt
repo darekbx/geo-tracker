@@ -7,6 +7,9 @@ import android.provider.MediaStore
 import androidx.core.content.contentValuesOf
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.darekbx.geotracker.repository.entities.PlaceDto
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +20,11 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Database(entities = [PointDto::class, TrackDto::class], version = 1, exportSchema = false)
+@Database(
+    entities = [PointDto::class, TrackDto::class, PlaceDto::class],
+    version = 2,
+    exportSchema = true
+)
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
@@ -72,8 +79,22 @@ abstract class AppDatabase : RoomDatabase() {
                 callback(null)
             }
         }
+
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+CREATE TABLE IF NOT EXISTS `place` (
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
+    `label` TEXT NOT NULL, 
+    `latitude` REAL NOT NULL, 
+    `longitude` REAL NOT NULL, 
+    `timestamp` INTEGER NOT NULL
+)""")
+            }
+        }
     }
 
     abstract fun trackDao(): TrackDao
     abstract fun pointDao(): PointDao
+    abstract fun placeDao(): PlaceDao
 }

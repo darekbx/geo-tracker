@@ -21,6 +21,7 @@ object CommonModule {
     fun appDatabase(@ApplicationContext context: Context) =
         Room
             .databaseBuilder(context, AppDatabase::class.java, AppDatabase.DB_NAME)
+            .addMigrations(AppDatabase.MIGRATION_1_2)
             .build()
 
     @Singleton
@@ -30,6 +31,10 @@ object CommonModule {
     @Singleton
     @Provides
     fun provideTrackDao(db: AppDatabase) = db.trackDao()
+
+    @Singleton
+    @Provides
+    fun providePlaceDao(db: AppDatabase) = db.placeDao()
 
     @Singleton
     @Provides
