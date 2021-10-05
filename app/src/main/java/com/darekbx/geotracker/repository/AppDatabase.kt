@@ -50,6 +50,10 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        fun getDatabaseSize(context: Context): Long {
+            return context.getDatabasePath(DB_NAME).length()
+        }
+
         fun makeBackup(context: Context, callback: (path: String?) -> Unit) {
             try {
                 val currentDate = SimpleDateFormat("yyyyMMdd_HHmm").format(Calendar.getInstance().timeInMillis)

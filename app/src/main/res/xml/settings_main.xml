@@ -47,6 +47,9 @@
             app:useSimpleSummaryProvider="true"
             android:enabled="false"
             />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/settings_backup_category">
         <Preference
             android:key="@string/settings_backup_button_key"
             android:title="@string/settings_backup_button_title"
@@ -54,6 +57,14 @@
         <Preference
             android:key="@string/settings_restore_button_key"
             android:title="@string/settings_restore_button_title"
+            />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/settings_other_category">
+        <Preference
+            android:key="preference_db_size"
+            android:title="@string/settings_data_size_title"
+            android:summary="10.4MB"
             />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.FileUtils
+import android.text.format.Formatter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -17,6 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -43,6 +46,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 }
                 false
             }
+
+        findPreference<Preference>(getString(R.string.settings_db_size))
+            ?.summary = calculateDatabaseSize()
     }
 
     override fun onResume() {
@@ -90,6 +96,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     sharedPreferences?.getBoolean(key, defaultValue) ?: defaultValue
             }
         }
+    }
+
+    private fun calculateDatabaseSize(): String {
+        val size = AppDatabase.getDatabaseSize(requireContext())
+        return Formatter.formatFileSize(requireContext(), size)
     }
 
     private fun makeBackup() {

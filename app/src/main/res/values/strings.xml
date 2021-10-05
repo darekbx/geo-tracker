@@ -54,6 +54,9 @@
     <string name="location_format">Location: %1$.4f, %2$.4f</string>
 
     <string name="settings_gps_category">Settings</string>
+    <string name="settings_backup_category">Backup</string>
+    <string name="settings_other_category">Other</string>
+    <string name="settings_data_size_title">Application database size</string>
     <string name="settings_interval_dialog_title">Minimum interval</string>
     <string name="settings_interval_summary">Set interval in seconds</string>
     <string name="settings_interval">Location refresh min interval [s]</string>
@@ -71,6 +74,7 @@
     <string name="settings_backup_button_key">backup_button</string>
     <string name="settings_restore_button_title">Restore data from backup</string>
     <string name="settings_restore_button_key">restore_button</string>
+    <string name="settings_db_size">preference_db_size</string>
     <string name="settings_backup_success">Backup was saved to: %s</string>
     <string name="settings_backup_error">Unable to make a backup, check logs for more details!</string>
     <string name="settings_restore_success">Data was restored!</string>
