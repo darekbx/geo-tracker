@@ -12,14 +12,17 @@ object DateTimeUtils {
         SimpleDateFormat(DATE_FORMAT).format(it)
     }
 
-    fun getFormattedTime(timeInSeconds: Int): String {
+    fun getFormattedTime(timeInSeconds: Int, showSeconds: Boolean = true): String {
         var time = timeInSeconds
         val hours = time / 3600
         time %= 3600
         val minutes = time / 60
         time %= 60
         val seconds = time
-        return "${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
+        return if (showSeconds)
+            "${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
+        else
+            "${hours.pad()}h ${minutes.pad()}m"
     }
 
     private fun Int.pad() = toString().padStart(2, '0')

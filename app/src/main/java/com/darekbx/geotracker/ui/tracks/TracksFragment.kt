@@ -197,7 +197,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
             } ?: 0
         }
         sum_distance.text = getString(R.string.distance_format, totalDistance)
-        sum_time.text = DateTimeUtils.getFormattedTime(totalTime)
+        sum_time.text = DateTimeUtils.getFormattedTime(totalTime, showSeconds = false)
     }
 
     private fun startTracking(trackId: Long) {
