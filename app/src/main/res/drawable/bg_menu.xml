@@ -7,10 +7,10 @@
             <solid android:color="@color/colorPrimary" />
         </shape>
     </item>
-    <item android:gravity="start">
+    <item android:gravity="top">
         <shape
             android:shape="rectangle">
-            <size android:width="1px" />
+            <size android:height="1px" />
             <solid android:color="#fff" />
         </shape>
     </item>
