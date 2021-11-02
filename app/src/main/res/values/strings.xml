@@ -52,6 +52,8 @@
     <string name="dialog_add_place_label">Enter place label</string>
     <string name="dialog_place_label">Place to visit</string>
     <string name="location_format">Location: %1$.4f, %2$.4f</string>
+    <string name="calendar_month_format">%s, %.2fkm, %o days ridden</string>
+    <string name="calendar_year_header">%o days ridden this year</string>
 
     <string name="settings_gps_category">Settings</string>
     <string name="settings_backup_category">Backup</string>
