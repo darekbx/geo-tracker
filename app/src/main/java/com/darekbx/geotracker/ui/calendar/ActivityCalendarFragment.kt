@@ -66,18 +66,9 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
         calendar_view.setup(firstMonth, lastMonth, DayOfWeek.MONDAY)
         calendar_view.scrollToMonth(currentMonth)
 
-        val daysOnBike = daysOnBikeThisYear(daySummaries, year)
+        val daysOnBike = daySummaries.size
         year_header.text = getString(R.string.calendar_year_header, daysOnBike)
     }
-
-    private fun daysOnBikeThisYear(
-        daySummaries: List<DaySummary>,
-        year: Int
-    ) = daySummaries
-        .groupingBy { it.dateFormatted.take(4).toInt() == year }
-        .eachCount()
-        .values
-        .sum()
 
     private fun dayBinder(
         dayOfYear: Int,
@@ -159,7 +150,6 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
                 val yearMonth = "${month.year}-${paddedMonth}"
                 val monthSummaries = daySummaries.filter { it.dateFormatted.take(7) == yearMonth }
                 val monthSummariesCount = monthSummaries.size
-                val daysOnBike = daysOnBikeByMonth(yearMonth)
 
                 if (monthSummariesCount > 0) {
                     val monthDistance = monthSummaries.sumByDouble { it.sumDistance }
@@ -167,17 +157,11 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
                         R.string.calendar_month_format,
                         monthName,
                         monthDistance,
-                        daysOnBike
+                        monthSummariesCount
                     )
                 } else {
                     container.textView.text = monthName
                 }
             }
-
-            private fun daysOnBikeByMonth(yearMonth: String) = daySummaries
-                .groupingBy { it.dateFormatted == yearMonth }
-                .eachCount()
-                .values
-                .sum()
         }
 }
