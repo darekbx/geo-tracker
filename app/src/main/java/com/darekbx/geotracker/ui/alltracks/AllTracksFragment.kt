@@ -103,7 +103,6 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
             outlinePaint.color = color
             outlinePaint.strokeWidth = 6.0F
         }
-        polyline.actualPoints.clear()
 
         val mapPoints = points.map { point -> GeoPoint(point.latitude, point.longitude) }
         polyline.setPoints(mapPoints)

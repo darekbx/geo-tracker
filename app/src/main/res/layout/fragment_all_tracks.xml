@@ -33,8 +33,6 @@
             android:layout_gravity="center"
             android:indeterminate="false"
             android:progressDrawable="@drawable/circular_progress_bar"
-            android:max="100"
-            android:progress="50"
             />
     </FrameLayout>
 

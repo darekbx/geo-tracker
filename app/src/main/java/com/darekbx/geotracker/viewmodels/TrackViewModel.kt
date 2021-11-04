@@ -112,24 +112,6 @@ class TrackViewModel @ViewModelInject constructor(
         }
     }
 
-    fun fetchTracksWithPoints(nthPointsToSkip: Int = appPreferences.nthPointsToSkip) = flow {
-        val tracksSize = trackDao.countAllTracks()
-        var index = 0
-        trackDao
-            .fetchAllAscending()
-            .forEach { trackDto ->
-                val trackPoints = pointDao.fetchByTrackAsync(
-                    trackDto.id ?: throw IllegalStateException("Empty id"),
-                    nthPointsToSkip
-                )
-                progress.postValue(Progress(++index, tracksSize))
-                val track = mapTrackDtoToTrack(trackDto).apply {
-                    points = trackPoints
-                }
-                emit(track)
-            }
-    }.asLiveData(Dispatchers.IO)
-
     fun fetchAllPoints(nthPointsToSkip: Int = appPreferences.nthPointsToSkip): LiveData<Map<Long, List<SimplePointDto>>> {
         return MutableLiveData<Map<Long ,List<SimplePointDto>>>().apply {
             ioScope.launch {
