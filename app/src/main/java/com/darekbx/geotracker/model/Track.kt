@@ -1,6 +1,7 @@
 package com.darekbx.geotracker.model
 
 import com.darekbx.geotracker.repository.entities.PointDto
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 
 class Track(
     val id: Long?,
@@ -14,4 +15,5 @@ class Track(
 ) {
     val isTimeBroken = startTimestamp?.take(10) != endTimestamp?.take(10)
     fun hasPoints() = (pointsCount ?: 0) > 0
+    var simplePoints: List<SimplePointDto> = emptyList()
 }

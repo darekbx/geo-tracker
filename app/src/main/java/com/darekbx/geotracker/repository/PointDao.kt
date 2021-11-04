@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.darekbx.geotracker.repository.entities.PointDto
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 
 @Dao
 interface PointDao {
@@ -14,6 +15,12 @@ interface PointDao {
 
     @Query("SELECT * FROM point WHERE track_id = :trackId AND ROWID % :nhtTwoToSkip == 0")
     fun fetchByTrackAsync(trackId: Long, nhtTwoToSkip: Int): List<PointDto>
+
+    @Query("SELECT track_id, latitude, longitude FROM point WHERE track_id = :trackId AND ROWID % :nhtTwoToSkip == 0")
+    fun fetchSimpleByTrackAsync(trackId: Long, nhtTwoToSkip: Int): List<SimplePointDto>
+
+    @Query("SELECT track_id, latitude, longitude FROM point WHERE ROWID % :nhtTwoToSkip == 0")
+    fun fetchAllPoints(nhtTwoToSkip: Int): List<SimplePointDto>
 
     @Query("DELETE FROM point WHERE track_id = :trackId")
     fun deleteByTrack(trackId: Long)

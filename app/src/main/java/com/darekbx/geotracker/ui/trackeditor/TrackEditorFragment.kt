@@ -18,9 +18,13 @@ import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.databinding.FragmentTrackEditorBinding
 import com.darekbx.geotracker.model.Track
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_all_tracks.*
+import kotlinx.android.synthetic.main.fragment_all_tracks.map
+import kotlinx.android.synthetic.main.fragment_track.*
 import kotlinx.coroutines.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -50,15 +54,6 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        tracksViewModel.progress.observe(viewLifecycleOwner, Observer { progress ->
-            binding.progressView.progress = progress.value
-            binding.progressView.max = progress.max
-
-            if (progress.isCompleted) {
-                hideProgress()
-            }
-        })
 
         tracksViewModel.pointsDeleteResult.observe(viewLifecycleOwner, Observer {
             hideProgress()
@@ -138,7 +133,10 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
         if (trackId != null) {
             tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
                 trackToEdit = track
-                displayTrack(track, currentTrackStyle(), CUT_OVERLAY_ID)
+                val simplePoints = track.points.map {
+                    SimplePointDto(it.trackId, it.latitude, it.longitude)
+                }
+                displayTrack(simplePoints, currentTrackStyle(), CUT_OVERLAY_ID)
                 fetchTracksWithPoints()
                 updateSummary()
             })
@@ -146,7 +144,6 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
     }
 
     private fun save() {
-
         showProgress()
         val trackId = arguments?.getLong(TrackFragment.TRACK_ID_KEY)
         if (trackId != null) {
@@ -168,13 +165,28 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
     }
 
     private fun fetchTracksWithPoints() {
-        tracksViewModel.fetchTracksWithPoints(
-            nthPointsToSkip = POINTS_TO_SKIP
-        ).observe(viewLifecycleOwner, Observer { track ->
-            if (trackToEdit?.id != track.id) {
-                displayTrack(track, otherTracksStyle())
+        tracksViewModel.fetchAllPoints(POINTS_TO_SKIP).observe(viewLifecycleOwner, Observer { grouppedPoints ->
+            for (points in grouppedPoints) {
+                if (trackToEdit?.id != points.key) {
+                    displayTrack(points.value, otherTracksStyle())
+                }
             }
+            loading_view.visibility = View.GONE
+            map.invalidateMapCoordinates(map.projection.screenRect)
+            hideProgress()
         })
+    }
+
+    private fun displayTrack(points: List<SimplePointDto>, trackStyle: TrackStyle, overlayId: String? = null) {
+        val polyline = Polyline().apply {
+            id = overlayId
+            outlinePaint.color = trackStyle.color
+            outlinePaint.strokeWidth = trackStyle.width
+        }
+
+        val mapPoints = points.map { point -> GeoPoint(point.latitude, point.longitude) }
+        polyline.setPoints(mapPoints)
+        map.overlays.add(polyline)
     }
 
     private fun initializeMap() {
@@ -186,20 +198,6 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         binding.map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
         binding.map.setMultiTouchControls(true)
-    }
-
-    private fun displayTrack(track: Track, trackStyle: TrackStyle, overlayId: String? = null) {
-        val polyline = Polyline().apply {
-            id = overlayId
-            outlinePaint.color = trackStyle.color
-            outlinePaint.strokeWidth = trackStyle.width
-        }
-
-        val mapPoints = track.points.map { point -> GeoPoint(point.latitude, point.longitude) }
-        polyline.setPoints(mapPoints)
-
-        binding.map.overlays.add(polyline)
-        binding.map.invalidateMapCoordinates(binding.map.projection.screenRect)
     }
 
     private fun subTrack(trackStyle: TrackStyle) {
