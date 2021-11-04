@@ -9,6 +9,7 @@ import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.PointDao
 import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.repository.entities.PointDto
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.geotracker.repository.entities.TrackPoints
 import com.darekbx.geotracker.utils.AppPreferences
@@ -129,12 +130,34 @@ class TrackViewModel @ViewModelInject constructor(
             }
     }.asLiveData(Dispatchers.IO)
 
+    fun fetchAllPoints(nthPointsToSkip: Int = appPreferences.nthPointsToSkip): LiveData<Map<Long, List<SimplePointDto>>> {
+        return MutableLiveData<Map<Long ,List<SimplePointDto>>>().apply {
+            ioScope.launch {
+                val points = pointDao
+                    .fetchAllPoints(nthPointsToSkip)
+                    .groupBy { it.trackId }
+                postValue(points)
+            }
+        }
+    }
+
     fun fetchTrack(trackId: Long) =
         MutableLiveData<Track>().apply {
             ioScope.launch {
                 trackDao.fetch(trackId)?.let { trackDto ->
                     val track = mapTrackDtoToTrack(trackDto)
                     track.points = pointDao.fetchByTrackAsync(trackId, 1 /* dont skip nth rows */)
+                    postValue(track)
+                }
+            }
+        }
+
+    fun fetchSimpleTrack(trackId: Long) =
+        MutableLiveData<Track>().apply {
+            ioScope.launch {
+                trackDao.fetch(trackId)?.let { trackDto ->
+                    val track = mapTrackDtoToTrack(trackDto)
+                    track.simplePoints = pointDao.fetchSimpleByTrackAsync(trackId, 1 /* dont skip nth rows */)
                     postValue(track)
                 }
             }

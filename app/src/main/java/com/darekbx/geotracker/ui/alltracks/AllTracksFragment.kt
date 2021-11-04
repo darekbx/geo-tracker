@@ -13,6 +13,7 @@ import androidx.preference.PreferenceManager
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.model.Track
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,15 +46,6 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tracksViewModel.progress.observe(viewLifecycleOwner, Observer { progress ->
-            progress_view.progress = progress.value
-            progress_view.max = progress.max
-
-            if (progress.isCompleted) {
-                loading_view.visibility = View.GONE
-            }
-        })
-
         loadAllTracks()
         initializeMap()
         zoomToCurrentLocation()
@@ -73,9 +65,9 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
         loading_view.visibility = View.VISIBLE
         val trackId = arguments?.getLong(TrackFragment.TRACK_ID_KEY)
         if (trackId != null) {
-            tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
+            tracksViewModel.fetchSimpleTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
                 trackToOverlap = track
-                displayTrack(trackToOverlap!!, COLOR_RED)
+                displayTrackX(trackToOverlap!!.simplePoints, COLOR_RED)
                 fetchTracksWithPoints()
             })
         } else {
@@ -84,10 +76,14 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
     }
 
     private fun fetchTracksWithPoints() {
-        tracksViewModel.fetchTracksWithPoints().observe(viewLifecycleOwner, Observer { track ->
-            if (trackToOverlap?.id != track.id) {
-                displayTrack(track)
+        tracksViewModel.fetchAllPoints().observe(viewLifecycleOwner, Observer { grouppedPoints ->
+            for (points in grouppedPoints) {
+                if (trackToOverlap?.id != points.key) {
+                    displayTrackX(points.value)
+                }
             }
+            loading_view.visibility = View.GONE
+            map.invalidateMapCoordinates(map.projection.screenRect)
         })
     }
 
@@ -102,16 +98,16 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
         map.setMultiTouchControls(true)
     }
 
-    private fun displayTrack(track: Track, color: Int = provideColor()) {
+    private fun displayTrackX(points: List<SimplePointDto>, color: Int = provideColor()) {
         val polyline = Polyline().apply {
             outlinePaint.color = color
             outlinePaint.strokeWidth = 6.0F
         }
+        polyline.actualPoints.clear()
 
-        val mapPoints = track.points.map { point -> GeoPoint(point.latitude, point.longitude) }
+        val mapPoints = points.map { point -> GeoPoint(point.latitude, point.longitude) }
         polyline.setPoints(mapPoints)
         map.overlays.add(polyline)
-        map.invalidateMapCoordinates(map.projection.screenRect)
     }
 
     private fun provideColor() =

@@ -1,6 +1,7 @@
 package com.darekbx.geotracker.repository
 
 import androidx.room.*
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.geotracker.repository.entities.TrackPoints
 
@@ -24,6 +25,7 @@ ORDER BY track.id DESC
     @Query("SELECT COUNT(id) FROM track LIMIT 1")
     fun countAllTracks(): Int
 
+    @Deprecated("Use fetchAllPoints")
     @Query("SELECT * FROM track ORDER BY id ASC")
     fun fetchAllAscending(): List<TrackDto>
 
