@@ -9,7 +9,7 @@ import android.location.LocationManager
 class LastKnownLocation(private val context: Context) {
 
     companion object {
-        private const val DUMMY_LOCATION = true
+        private const val DUMMY_LOCATION = false
     }
 
     fun getLocation(): Location? {
