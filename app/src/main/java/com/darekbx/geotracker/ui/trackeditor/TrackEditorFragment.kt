@@ -1,9 +1,7 @@
 package com.darekbx.geotracker.ui.trackeditor
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Color
-import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +15,7 @@ import androidx.preference.PreferenceManager
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.databinding.FragmentTrackEditorBinding
+import com.darekbx.geotracker.location.LastKnownLocation
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.ui.track.TrackFragment
@@ -24,14 +23,13 @@ import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_all_tracks.*
 import kotlinx.android.synthetic.main.fragment_all_tracks.map
-import kotlinx.android.synthetic.main.fragment_track.*
 import kotlinx.coroutines.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Polyline
-import java.util.*
+import javax.inject.Inject
 
 @SuppressLint("MissingPermission")
 @AndroidEntryPoint
@@ -40,6 +38,7 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
     private var _binding: FragmentTrackEditorBinding? = null
     private val binding get() = _binding!!
 
+    @Inject lateinit var lastKnownLocation: LastKnownLocation
     private val tracksViewModel: TrackViewModel by viewModels()
     private var trackToEdit: Track? = null
 
@@ -228,13 +227,13 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
     @SuppressLint("MissingPermission")
     private fun zoomToCurrentLocation() {
         CoroutineScope(Dispatchers.IO).launch {
-            val lastKnownLocation = this@TrackEditorFragment.lastKnownLocation
-            if (lastKnownLocation != null) {
+            val location = lastKnownLocation.getLocation()
+            if (location != null) {
                 withContext(Dispatchers.Main) {
                     binding.map.controller.apply {
                         setZoom(DEFAULT_MAP_ZOOM)
                         val startPoint =
-                            GeoPoint(lastKnownLocation.latitude, lastKnownLocation.longitude)
+                            GeoPoint(location.latitude, location.longitude)
                         setCenter(startPoint)
                     }
                 }
@@ -244,12 +243,6 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
 
     private fun currentTrackStyle() = TrackStyle.Current(COLOR_RED, 12F)
     private fun otherTracksStyle() = TrackStyle.Shadowed(COLOR_GRAY, 6F)
-
-    private val lastKnownLocation by lazy {
-        val locationManager =
-            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)
-    }
 
     companion object {
         private val COLOR_RED = Color.parseColor("#f44336")

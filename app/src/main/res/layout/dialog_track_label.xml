@@ -29,12 +29,27 @@
         android:layout_marginTop="@dimen/padding_medium"
         android:hint="@string/label_hint"
         />
-    <Button
-        android:id="@+id/save_button"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/button_save"
-        />
-
+        android:orientation="horizontal"
+        >
+        <Button
+            android:id="@+id/discard_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"
+            android:text="@string/button_discard"
+            />
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="1"
+            android:text="@string/button_save"
+            />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </LinearLayout>

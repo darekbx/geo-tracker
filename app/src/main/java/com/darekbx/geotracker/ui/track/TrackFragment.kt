@@ -209,6 +209,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
                     tracksViewModel.updateTrack(trackId, label)
                 }
             }
+            discardCallback = { /* Do nothing */ }
         }.show(parentFragmentManager, SaveTrackDialog::class.java.simpleName)
     }
 }

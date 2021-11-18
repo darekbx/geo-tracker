@@ -3,7 +3,6 @@ package com.darekbx.geotracker.viewmodels
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.darekbx.geotracker.model.DaySummary
-import com.darekbx.geotracker.model.Progress
 import com.darekbx.geotracker.model.RecordStatus
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.PointDao
@@ -18,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.lang.IllegalStateException
+import org.osmdroid.util.GeoPoint
 import java.util.concurrent.TimeUnit
 
 class TrackViewModel @ViewModelInject constructor(
@@ -39,7 +38,6 @@ class TrackViewModel @ViewModelInject constructor(
     var daySummaries = MutableLiveData<List<DaySummary>>()
     var pointsDeleteResult = MutableLiveData<Boolean>()
     var fixResult = MutableLiveData<Boolean>()
-    var progress = MutableLiveData<Progress>()
     var trackLoadingStatus = MutableLiveData<Boolean>()
 
     @ExperimentalCoroutinesApi
@@ -157,7 +155,10 @@ class TrackViewModel @ViewModelInject constructor(
                     val averageSpeed = if (points.size > 1) averageSpeed(points) else 0F
                     val speed = if (points.isEmpty()) 0.0F else points.last().speed
                     val time = (System.currentTimeMillis() - (track?.startTimestamp ?: 0L)) / 1000
-                    postValue(RecordStatus(points.size, distance, averageSpeed, speed, time))
+
+                    val maxPoint = points.maxBy { it.timestamp }
+                    val location = maxPoint?.let { GeoPoint(maxPoint.latitude, maxPoint.longitude) }
+                    postValue(RecordStatus(points.size, distance, averageSpeed, speed, time, location))
                 }
             }
         }

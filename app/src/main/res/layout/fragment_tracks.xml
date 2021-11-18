@@ -172,23 +172,15 @@
         android:visibility="gone"
         >
 
-        <androidx.legacy.widget.Space
-            android:id="@+id/center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
-
         <FrameLayout
             android:id="@+id/record_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/mini_map"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/padding_medium_24"
             android:layout_marginStart="@dimen/padding_large"
             android:layout_marginEnd="@dimen/padding_large"
             android:padding="@dimen/padding_medium"
@@ -212,13 +204,30 @@
                 />
         </FrameLayout>
 
+        <org.osmdroid.views.MapView
+            android:id="@+id/mini_map"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/record_container"
+            app:layout_constraintBottom_toTopOf="@id/label_container"
+            android:layout_marginTop="@dimen/padding_medium"
+            android:layout_marginStart="@dimen/padding_large"
+            android:layout_marginEnd="@dimen/padding_large"
+            android:padding="@dimen/padding_medium"
+            android:background="@color/colorPrimary"
+            />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/label_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/record_container"
+            app:layout_constraintTop_toBottomOf="@id/mini_map"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="@dimen/padding_large"
             android:layout_marginStart="@dimen/padding_large"
             android:layout_marginEnd="@dimen/padding_large"
             android:layout_marginTop="@dimen/padding_medium"

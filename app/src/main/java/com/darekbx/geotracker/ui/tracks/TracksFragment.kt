@@ -12,10 +12,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
+import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.location.ForegroundTracker
 import com.darekbx.geotracker.location.ForegroundTracker.Companion.TRACK_ID_KEY
 import com.darekbx.geotracker.model.Track
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.utils.DateTimeUtils
 import com.darekbx.geotracker.utils.LocationUtils
@@ -23,7 +26,14 @@ import com.darekbx.geotracker.utils.PermissionRequester
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracks.*
+import kotlinx.android.synthetic.main.fragment_tracks.loading_view
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
@@ -31,11 +41,12 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     companion object {
         const val STOP_ACTION = "stop_action"
+        const val DEFAULT_MAP_ZOOM = 16.0
     }
 
     private val tracksViewModel: TrackViewModel by viewModels()
-
     private var currentTrackId: Long? = null
+    private var miniMapMarker: Marker? = null
 
     private val stopBroadcast = object: BroadcastReceiver() {
         override fun onReceive(context: Context?, data: Intent?) {
@@ -97,6 +108,12 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     override fun onResume() {
         super.onResume()
         checkLocationEnabled(requireContext())
+        mini_map.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mini_map.onPause()
     }
 
     private fun subscribeToActiveTrack() {
@@ -131,6 +148,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 tracksViewModel.subscribeToPoints(trackId)
                 currentTrackId = trackId
 
+                startMiniMap()
                 observePointsChanges()
             }
         })
@@ -168,12 +186,70 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         }
     }
 
+    private fun discardTrack() {
+        currentTrackId?.let { currentTrackId ->
+            stopTrackingService()
+            setUIMode(false)
+            deleteTrackConfirmation(
+                Track(currentTrackId, "Not saved track", "", "", "", 1F)
+            )
+        }
+    }
+
+    private fun startMiniMap() {
+        Configuration.getInstance()
+            .load(context, PreferenceManager.getDefaultSharedPreferences(context))
+        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
+
+        mini_map.setTileSource(TileSourceFactory.MAPNIK)
+        mini_map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
+        mini_map.controller.setZoom(DEFAULT_MAP_ZOOM)
+        mini_map.setMultiTouchControls(true)
+
+        miniMapMarker = Marker(mini_map).apply {
+            icon = resources.getDrawable(R.drawable.bg_seekbar_thumb, context?.theme)
+        }
+
+        fetchTracksWithPoints()
+    }
+
+    private fun fetchTracksWithPoints() {
+        mini_map.overlays.clear()
+        tracksViewModel.fetchAllPoints().observe(viewLifecycleOwner, Observer { grouppedPoints ->
+            for (points in grouppedPoints) {
+                displayTrack(points.value)
+            }
+            mini_map.invalidateMapCoordinates(mini_map.projection.screenRect)
+            mini_map.overlays.add(miniMapMarker)
+        })
+    }
+
+    private fun displayTrack(points: List<SimplePointDto>, color: Int = Color.RED) {
+        val polyline = Polyline().apply {
+            outlinePaint.color = color
+            outlinePaint.strokeWidth = 6.0F
+        }
+
+        val mapPoints = points.map { point -> GeoPoint(point.latitude, point.longitude) }
+        polyline.setPoints(mapPoints)
+        mini_map.overlays.add(polyline)
+    }
+
     private fun observePointsChanges() {
         tracksViewModel.recordStatus?.observe(viewLifecycleOwner, Observer { recordStatus ->
             distance_value.text = getString(R.string.distance_format, recordStatus.distance)
             speed_value.text = getString(R.string.speed_format, recordStatus.speed * 3.6F)
             avg_speed_value.text = getString(R.string.speed_format, recordStatus.averageSpeed * 3.6F)
             time_value.text = DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
+
+            if (miniMapMarker != null && recordStatus.location != null) {
+                mini_map.controller.apply {
+                    miniMapMarker?.position = recordStatus?.location
+                    miniMapMarker?.icon = resources.getDrawable(R.drawable.bg_seekbar_thumb, context?.theme)
+                    miniMapMarker?.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    setCenter(recordStatus.location)
+                }
+            }
         })
     }
 
@@ -217,6 +293,9 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                     saveCallback = { label ->
                         saveTrack(label)
                     }
+                    discardCallback = {
+                        discardTrack()
+                    }
                 }.show(parentFragmentManager, SaveTrackDialog::class.java.simpleName)
             }
         }
@@ -235,6 +314,9 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     }
 
     private fun openTrack(trackId: Long) {
+        if (status_container.visibility == View.VISIBLE) {
+            return
+        }
         val arguments = Bundle(1).apply {
             putLong(TrackFragment.TRACK_ID_KEY, trackId)
         }
@@ -246,7 +328,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         context?.let { context ->
             AlertDialog.Builder(context)
                 .setMessage(getString(R.string.delete_message, track.label))
-                .setNegativeButton(R.string.delete_no, null)
+                .setNegativeButton(R.string.delete_no, { _, _ -> tracksViewModel.fetchTracks() })
                 .setPositiveButton(R.string.delete_yes) { _, _ ->
                     track.id?.let { trackId ->
                         tracksViewModel.deleteTrack(trackId) {

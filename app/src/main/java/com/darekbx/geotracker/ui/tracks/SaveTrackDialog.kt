@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.main.dialog_track_label.*
 class SaveTrackDialog : DialogFragment(R.layout.dialog_track_label) {
 
     var saveCallback: ((String?) -> Unit)? = null
+    var discardCallback: (() -> Unit)? = null
     var initialLabel: String? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -28,6 +29,10 @@ class SaveTrackDialog : DialogFragment(R.layout.dialog_track_label) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         save_button.setOnClickListener { validateLabelAndSave() }
+        discard_button.setOnClickListener {
+            discardCallback?.invoke()
+            dismiss()
+        }
         input_label.setText(initialLabel ?: getString(R.string.default_track_name))
     }
 

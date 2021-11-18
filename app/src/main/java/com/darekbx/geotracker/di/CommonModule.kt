@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.darekbx.geotracker.livetracking.ILiveTracker
 import com.darekbx.geotracker.livetracking.HerokuLiveTracker
+import com.darekbx.geotracker.location.LastKnownLocation
 import com.darekbx.geotracker.repository.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -39,4 +40,9 @@ object CommonModule {
     @Singleton
     @Provides
     fun provideTracker(): ILiveTracker = HerokuLiveTracker()
+
+    @Singleton
+    @Provides
+    fun provideLastKnownLocation(@ApplicationContext context: Context): LastKnownLocation =
+        LastKnownLocation(context)
 }
