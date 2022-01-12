@@ -9,6 +9,9 @@ import com.darekbx.geotracker.repository.entities.PlaceDto
 @Dao
 interface PlaceDao {
 
+    @Query("SELECT COUNT(id) FROM place")
+    fun countAll(): LiveData<Int>
+
     @Query("SELECT * FROM place")
     fun fetchAllPlaces(): LiveData<List<PlaceDto>>
 

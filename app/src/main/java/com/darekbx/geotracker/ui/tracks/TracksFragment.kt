@@ -23,6 +23,7 @@ import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.utils.DateTimeUtils
 import com.darekbx.geotracker.utils.LocationUtils
 import com.darekbx.geotracker.utils.PermissionRequester
+import com.darekbx.geotracker.viewmodels.PlacesToVisitViewModel
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracks.*
@@ -45,6 +46,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     }
 
     private val tracksViewModel: TrackViewModel by viewModels()
+    private val placesToVisitViewModel: PlacesToVisitViewModel by viewModels()
     private var currentTrackId: Long? = null
     private var miniMapMarker: Marker? = null
 
@@ -137,6 +139,10 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     }
 
     private fun registerViewModel() {
+        placesToVisitViewModel.countAll().observe(viewLifecycleOwner, Observer {
+            places_to_visit_count.text = "$it"
+        })
+
         tracksViewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
             displayTracks(tracks)
             displaySummary(tracks.flatMap { it.value })

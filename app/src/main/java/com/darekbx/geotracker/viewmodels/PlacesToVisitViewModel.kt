@@ -47,6 +47,8 @@ class PlacesToVisitViewModel @ViewModelInject constructor(
             }
         )
 
+    fun countAll() = placeDao.countAll()
+
     private fun placeDtoToModel(placeDto: PlaceDto): PlaceToVisit =
         with(placeDto) {
             PlaceToVisit(id!!, label, latitude, longitude, timestamp)
