@@ -24,6 +24,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.DayOfWeek
 import java.time.YearMonth
 import java.util.Calendar
+import android.text.style.UnderlineSpan
+import android.text.SpannableString
 
 class DayViewContainer(view: View) : ViewContainer(view) {
     val dayTextView: TextView = view.findViewById(R.id.calendarDayText)
@@ -66,7 +68,7 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
         calendar_view.setup(firstMonth, lastMonth, DayOfWeek.MONDAY)
         calendar_view.scrollToMonth(currentMonth)
 
-        val daysOnBike = daySummaries.size
+        val daysOnBike = daySummaries.filter { it.dateFormatted.take(4).toInt() == year }.size
         year_header.text = getString(R.string.calendar_year_header, daysOnBike)
     }
 
@@ -134,6 +136,10 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
         ) {
             if (day.date.dayOfYear == dayOfYear && day.date.year == year) {
                 container.dayTextView.typeface = Typeface.DEFAULT_BOLD
+
+                val content = SpannableString(container.dayTextView.text)
+                content.setSpan(UnderlineSpan(), 0, content.length, 0)
+                container.dayTextView.text = content
             }
         }
     }
