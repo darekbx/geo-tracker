@@ -23,6 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/map"
+        app:layout_constraintBottom_toTopOf="@id/start_minus"
         android:padding="@dimen/padding_small"
         tools:text="seek_start"
         />
@@ -39,8 +40,8 @@
         />
     <Button
         android:id="@+id/start_plus"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="@dimen/seek_button_size"
+        android:layout_height="@dimen/seek_button_size"
         app:layout_constraintStart_toEndOf="@id/seek_start_label"
         app:layout_constraintTop_toTopOf="@id/seek_start"
         app:layout_constraintBottom_toBottomOf="@id/seek_start"
@@ -60,8 +61,8 @@
         />
     <Button
         android:id="@+id/start_minus"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="@dimen/seek_button_size"
+        android:layout_height="@dimen/seek_button_size"
         app:layout_constraintStart_toEndOf="@id/seek_start"
         app:layout_constraintEnd_toStartOf="@id/seek_start_value_label"
         app:layout_constraintTop_toTopOf="@id/seek_start"
@@ -86,6 +87,8 @@
         android:layout_height="wrap_content"
         android:text="@string/seek_end"
         android:padding="@dimen/padding_small"
+        android:layout_marginTop="@dimen/padding_medium"
+        android:layout_marginBottom="@dimen/padding_tiny"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="@id/seek_start_label"
         app:layout_constraintTop_toBottomOf="@id/seek_start_label"
@@ -93,8 +96,8 @@
         />
     <Button
         android:id="@+id/end_minus"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="@dimen/seek_button_size"
+        android:layout_height="@dimen/seek_button_size"
         app:layout_constraintStart_toEndOf="@id/seek_end_label"
         app:layout_constraintTop_toTopOf="@id/seek_end"
         app:layout_constraintBottom_toBottomOf="@id/seek_end"
@@ -115,8 +118,8 @@
         />
     <Button
         android:id="@+id/end_plus"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="@dimen/seek_button_size"
+        android:layout_height="@dimen/seek_button_size"
         app:layout_constraintStart_toEndOf="@id/seek_end"
         app:layout_constraintEnd_toStartOf="@id/seek_end_value_label"
         app:layout_constraintTop_toTopOf="@id/seek_end"

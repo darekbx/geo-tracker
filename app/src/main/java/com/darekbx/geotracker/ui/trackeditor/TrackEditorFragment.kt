@@ -110,11 +110,23 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
             }
         })
 
-        with (binding) {
-            startPlus.setOnClickListener { seekStart.increase() }
-            startMinus.setOnClickListener { seekStart.decrease() }
-            endPlus.setOnClickListener { seekEnd.increase() }
-            endMinus.setOnClickListener { seekEnd.decrease() }
+        with(binding) {
+            startPlus.setOnClickListener {
+                seekStart.decrease()
+                subTrack(currentTrackStyle())
+            }
+            startMinus.setOnClickListener {
+                seekStart.increase()
+                subTrack(currentTrackStyle())
+            }
+            endPlus.setOnClickListener {
+                seekEnd.decrease()
+                subTrack(currentTrackStyle())
+            }
+            endMinus.setOnClickListener {
+                seekEnd.increase()
+                subTrack(currentTrackStyle())
+            }
         }
     }
 
