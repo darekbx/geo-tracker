@@ -109,6 +109,21 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
                 subTrack(currentTrackStyle())
             }
         })
+
+        with (binding) {
+            startPlus.setOnClickListener { seekStart.increase() }
+            startMinus.setOnClickListener { seekStart.decrease() }
+            endPlus.setOnClickListener { seekEnd.increase() }
+            endMinus.setOnClickListener { seekEnd.decrease() }
+        }
+    }
+
+    private fun SeekBar.increase() {
+        progress = progress + 1
+    }
+
+    private fun SeekBar.decrease() {
+        progress = progress - 1
     }
 
     private fun lockProgress(seekBar: SeekBar, oppositeSeekBar: SeekBar, progress: Int) {

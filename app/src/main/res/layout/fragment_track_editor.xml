@@ -37,17 +37,36 @@
         app:layout_constraintTop_toBottomOf="@id/summary_label"
         app:layout_constraintBottom_toTopOf="@id/seek_end_label"
         />
+    <Button
+        android:id="@+id/start_plus"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        app:layout_constraintStart_toEndOf="@id/seek_start_label"
+        app:layout_constraintTop_toTopOf="@id/seek_start"
+        app:layout_constraintBottom_toBottomOf="@id/seek_start"
+        android:text="-"
+        />
     <SeekBar
         android:id="@+id/seek_start"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:max="100"
-        app:layout_constraintStart_toEndOf="@id/seek_start_label"
-        app:layout_constraintEnd_toStartOf="@id/seek_start_value_label"
+        app:layout_constraintStart_toEndOf="@id/start_plus"
+        app:layout_constraintEnd_toStartOf="@id/start_minus"
         app:layout_constraintTop_toTopOf="@id/seek_start_label"
         app:layout_constraintBottom_toBottomOf="@id/seek_start_label"
         android:thumb="@drawable/bg_seekbar_thumb"
         tools:progress="59"
+        />
+    <Button
+        android:id="@+id/start_minus"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        app:layout_constraintStart_toEndOf="@id/seek_start"
+        app:layout_constraintEnd_toStartOf="@id/seek_start_value_label"
+        app:layout_constraintTop_toTopOf="@id/seek_start"
+        app:layout_constraintBottom_toBottomOf="@id/seek_start"
+        android:text="+"
         />
     <TextView
         android:id="@+id/seek_start_value_label"
@@ -72,18 +91,37 @@
         app:layout_constraintTop_toBottomOf="@id/seek_start_label"
         app:layout_constraintBottom_toBottomOf="parent"
         />
+    <Button
+        android:id="@+id/end_minus"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        app:layout_constraintStart_toEndOf="@id/seek_end_label"
+        app:layout_constraintTop_toTopOf="@id/seek_end"
+        app:layout_constraintBottom_toBottomOf="@id/seek_end"
+        android:text="-"
+        />
     <SeekBar
         android:id="@+id/seek_end"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:scaleX="-1"
         android:max="100"
-        app:layout_constraintStart_toEndOf="@id/seek_end_label"
-        app:layout_constraintEnd_toStartOf="@id/seek_end_value_label"
+        app:layout_constraintStart_toEndOf="@id/end_minus"
+        app:layout_constraintEnd_toStartOf="@id/end_plus"
         app:layout_constraintTop_toTopOf="@id/seek_end_label"
         app:layout_constraintBottom_toBottomOf="@id/seek_end_label"
         android:thumb="@drawable/bg_seekbar_thumb"
         tools:progress="7"
+        />
+    <Button
+        android:id="@+id/end_plus"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        app:layout_constraintStart_toEndOf="@id/seek_end"
+        app:layout_constraintEnd_toStartOf="@id/seek_end_value_label"
+        app:layout_constraintTop_toTopOf="@id/seek_end"
+        app:layout_constraintBottom_toBottomOf="@id/seek_end"
+        android:text="+"
         />
     <TextView
         android:id="@+id/seek_end_value_label"
