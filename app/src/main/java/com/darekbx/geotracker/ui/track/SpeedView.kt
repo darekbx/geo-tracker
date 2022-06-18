@@ -72,7 +72,7 @@ class SpeedView(context: Context, attributeSet: AttributeSet) : View(context, at
         val width = width - leftPadding
 
         val count = values.count()
-        val maxValue = (values.max() ?: 1.0F)
+        val maxValue = (values.maxOrNull() ?: 1.0F)
         val avgValue = values.average().toFloat()
         val widthRatio = width / count.toFloat()
         val heightRatio = height / maxValue

@@ -10,11 +10,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
+import com.darekbx.geotracker.databinding.FragmentTracksBinding
 import com.darekbx.geotracker.location.ForegroundTracker
 import com.darekbx.geotracker.location.ForegroundTracker.Companion.TRACK_ID_KEY
 import com.darekbx.geotracker.model.Track
@@ -26,8 +26,6 @@ import com.darekbx.geotracker.utils.PermissionRequester
 import com.darekbx.geotracker.viewmodels.PlacesToVisitViewModel
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_tracks.*
-import kotlinx.android.synthetic.main.fragment_tracks.loading_view
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -40,9 +38,21 @@ import org.osmdroid.views.overlay.Polyline
 @AndroidEntryPoint
 class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
+    private var _binding: FragmentTracksBinding? = null
+    private val binding get() = _binding!!
+
     companion object {
         const val STOP_ACTION = "stop_action"
         const val DEFAULT_MAP_ZOOM = 16.0
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentTracksBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     private val tracksViewModel: TrackViewModel by viewModels()
@@ -66,32 +76,32 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
         tracksViewModel.fetchTracks()
 
-        button_all_tracks.setOnClickListener {
+        binding.buttonAllTracks.setOnClickListener {
             findNavController()
                 .navigate(R.id.action_tracksFragment_to_allTracksFragment)
         }
 
-        button_settings.setOnClickListener {
+        binding.buttonSettings.setOnClickListener {
             findNavController()
                 .navigate(R.id.action_tracksFragment_to_settingsFragment)
         }
 
-        button_calendar.setOnClickListener {
+        binding.buttonCalendar.setOnClickListener {
             findNavController()
                 .navigate(R.id.action_tracksFragment_to_activityCalendarFragment)
         }
 
-        button_places_to_visit.setOnClickListener {
+        binding.buttonPlacesToVisit.setOnClickListener {
             findNavController()
                 .navigate(R.id.action_tracksFragment_to_placesToVisitFragment)
         }
 
-        tracks_list.setAdapter(trackAdapter)
+        binding.tracksList.setAdapter(trackAdapter)
 
         activity?.registerReceiver(stopBroadcast, IntentFilter(STOP_ACTION))
 
         val animation = AnimationUtils.loadAnimation(requireContext(), R.anim.anim_record_scale)
-        recording_animation.startAnimation(animation)
+        binding.recordingAnimation.startAnimation(animation)
 
         subscribeToActiveTrack()
     }
@@ -110,12 +120,12 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     override fun onResume() {
         super.onResume()
         checkLocationEnabled(requireContext())
-        mini_map.onResume()
+        binding.miniMap.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mini_map.onPause()
+        binding.miniMap.onPause()
     }
 
     private fun subscribeToActiveTrack() {
@@ -129,7 +139,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun checkLocationEnabled(context: Context) {
         val locationEnabled = LocationUtils.isLocationEnabled(context)
-        button_record.isEnabled = locationEnabled
+        binding.buttonRecord.isEnabled = locationEnabled
         if (!locationEnabled) {
             AlertDialog.Builder(context)
                 .setMessage(R.string.location_is_not_enabled)
@@ -139,17 +149,17 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     }
 
     private fun registerViewModel() {
-        placesToVisitViewModel.countAll().observe(viewLifecycleOwner, Observer {
-            places_to_visit_count.text = "$it"
-        })
+        placesToVisitViewModel.countAll().observe(viewLifecycleOwner) {
+            binding.placesToVisitCount.text = "$it"
+        }
 
-        tracksViewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
+        tracksViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
             displayTracks(tracks)
             displaySummary(tracks.flatMap { it.value })
-        })
+        }
 
-        tracksViewModel.newTrackid.observe(viewLifecycleOwner, Observer { trackId ->
-            if (status_container.isVisible) {
+        tracksViewModel.newTrackid.observe(viewLifecycleOwner) { trackId ->
+            if (binding.statusContainer.isVisible) {
                 startTracking(trackId)
                 tracksViewModel.subscribeToPoints(trackId)
                 currentTrackId = trackId
@@ -157,19 +167,19 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 startMiniMap()
                 observePointsChanges()
             }
-        })
+        }
 
-        tracksViewModel.updateResult.observe(viewLifecycleOwner, Observer {
+        tracksViewModel.updateResult.observe(viewLifecycleOwner) {
             setUIMode(isRecording = false)
-        })
+        }
 
-        tracksViewModel.trackLoadingStatus.observe(viewLifecycleOwner, Observer { isLoading ->
-            loading_view.visibility = if (isLoading) View.VISIBLE else View.GONE
-        })
+        tracksViewModel.trackLoadingStatus.observe(viewLifecycleOwner) { isLoading ->
+            binding.loadingView.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
     }
 
     private fun handleStopRecordActions() {
-        button_record.setOnClickListener {
+        binding.buttonRecord.setOnClickListener {
             fineLocation.runWithPermission {
                 backgroundLocation.runWithPermission {
                     setUIMode(isRecording = true)
@@ -178,11 +188,11 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
             }
         }
 
-        button_stop.setOnClickListener {
+        binding.buttonStop.setOnClickListener {
             stopTracking()
         }
 
-        button_stop.hide()
+        binding.buttonStop.hide()
     }
 
     private fun saveTrack(label: String?) {
@@ -207,12 +217,12 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
-        mini_map.setTileSource(TileSourceFactory.MAPNIK)
-        mini_map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
-        mini_map.controller.setZoom(DEFAULT_MAP_ZOOM)
-        mini_map.setMultiTouchControls(true)
+        binding.miniMap.setTileSource(TileSourceFactory.MAPNIK)
+        binding.miniMap.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
+        binding.miniMap.controller.setZoom(DEFAULT_MAP_ZOOM)
+        binding.miniMap.setMultiTouchControls(true)
 
-        miniMapMarker = Marker(mini_map).apply {
+        miniMapMarker = Marker(binding.miniMap).apply {
             icon = resources.getDrawable(R.drawable.bg_seekbar_thumb, context?.theme)
         }
 
@@ -220,14 +230,14 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     }
 
     private fun fetchTracksWithPoints() {
-        mini_map.overlays.clear()
-        tracksViewModel.fetchAllPoints().observe(viewLifecycleOwner, Observer { grouppedPoints ->
+        binding.miniMap.overlays.clear()
+        tracksViewModel.fetchAllPoints().observe(viewLifecycleOwner) { grouppedPoints ->
             for (points in grouppedPoints) {
                 displayTrack(points.value)
             }
-            mini_map.invalidateMapCoordinates(mini_map.projection.screenRect)
-            mini_map.overlays.add(miniMapMarker)
-        })
+            binding.miniMap.invalidateMapCoordinates(binding.miniMap.projection.screenRect)
+            binding.miniMap.overlays.add(miniMapMarker)
+        }
     }
 
     private fun displayTrack(points: List<SimplePointDto>, color: Int = Color.RED) {
@@ -238,30 +248,30 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
         val mapPoints = points.map { point -> GeoPoint(point.latitude, point.longitude) }
         polyline.setPoints(mapPoints)
-        mini_map.overlays.add(polyline)
+        binding.miniMap.overlays.add(polyline)
     }
 
     private fun observePointsChanges() {
-        tracksViewModel.recordStatus?.observe(viewLifecycleOwner, Observer { recordStatus ->
-            distance_value.text = getString(R.string.distance_format, recordStatus.distance)
-            speed_value.text = getString(R.string.speed_format, recordStatus.speed * 3.6F)
-            avg_speed_value.text = getString(R.string.speed_format, recordStatus.averageSpeed * 3.6F)
-            time_value.text = DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
+        tracksViewModel.recordStatus?.observe(viewLifecycleOwner) { recordStatus ->
+            binding.distanceValue.text = getString(R.string.distance_format, recordStatus.distance)
+            binding.speedValue.text = getString(R.string.speed_format, recordStatus.speed * 3.6F)
+            binding.avgSpeedValue.text = getString(R.string.speed_format, recordStatus.averageSpeed * 3.6F)
+            binding.timeValue.text = DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
 
             if (miniMapMarker != null && recordStatus.location != null) {
-                mini_map.controller.apply {
+                binding.miniMap.controller.apply {
                     miniMapMarker?.position = recordStatus?.location
                     miniMapMarker?.icon = resources.getDrawable(R.drawable.bg_seekbar_thumb, context?.theme)
                     miniMapMarker?.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                     setCenter(recordStatus.location)
                 }
             }
-        })
+        }
     }
 
     private fun displayTracks(tracks: Map<String?, List<Track>>) {
         trackAdapter.items = tracks
-        tracks_list.expandGroup(0)
+        binding.tracksList.expandGroup(0)
     }
 
     private fun displaySummary(tracks: List<Track>) {
@@ -269,7 +279,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         for (track in tracks) {
             totalDistance += track.distance
         }
-        val totalTime = tracks.sumBy { track ->
+        val totalTime = tracks.sumOf { track ->
             track.timeDifference?.takeIf { it.isNotEmpty() }?.let { difference ->
                 val chunks = difference.split(" ")
                 val hours = chunks[0].removeSuffix("h").toIntOrNull() ?: 0
@@ -278,8 +288,8 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 hours * 60 * 60 + minutes * 60 + seconds
             } ?: 0
         }
-        sum_distance.text = getString(R.string.distance_format, totalDistance)
-        sum_time.text = DateTimeUtils.getFormattedTime(totalTime, showSeconds = true)
+        binding.sumDistance.text = getString(R.string.distance_format, totalDistance)
+        binding.sumTime.text = DateTimeUtils.getFormattedTime(totalTime, showSeconds = true)
     }
 
     private fun startTracking(trackId: Long) {
@@ -320,7 +330,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     }
 
     private fun openTrack(trackId: Long) {
-        if (status_container.visibility == View.VISIBLE) {
+        if (binding.statusContainer.visibility == View.VISIBLE) {
             return
         }
         val arguments = Bundle(1).apply {
@@ -334,7 +344,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         context?.let { context ->
             AlertDialog.Builder(context)
                 .setMessage(getString(R.string.delete_message, track.label))
-                .setNegativeButton(R.string.delete_no, { _, _ -> tracksViewModel.fetchTracks() })
+                .setNegativeButton(R.string.delete_no) { _, _ -> tracksViewModel.fetchTracks() }
                 .setPositiveButton(R.string.delete_yes) { _, _ ->
                     track.id?.let { trackId ->
                         tracksViewModel.deleteTrack(trackId) {
@@ -349,14 +359,14 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun setUIMode(isRecording: Boolean) {
         when {
             isRecording -> {
-                button_stop.show()
-                button_record.hide()
-                status_container.visibility = View.VISIBLE
+                binding.buttonStop.show()
+                binding.buttonRecord.hide()
+                binding.statusContainer.visibility = View.VISIBLE
             }
             else -> {
-                button_stop.hide()
-                button_record.show()
-                status_container.visibility = View.GONE
+                binding.buttonStop.hide()
+                binding.buttonRecord.show()
+                binding.statusContainer.visibility = View.GONE
             }
         }
     }

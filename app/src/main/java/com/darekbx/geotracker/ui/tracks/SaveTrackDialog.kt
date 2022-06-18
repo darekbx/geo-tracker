@@ -3,16 +3,30 @@ package com.darekbx.geotracker.ui.tracks
 import android.app.Dialog
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.darekbx.geotracker.R
-import kotlinx.android.synthetic.main.dialog_track_label.*
+import com.darekbx.geotracker.databinding.DialogTrackLabelBinding
 
 class SaveTrackDialog : DialogFragment(R.layout.dialog_track_label) {
+
+    private var _binding: DialogTrackLabelBinding? = null
+    private val binding get() = _binding!!
 
     var saveCallback: ((String?) -> Unit)? = null
     var discardCallback: (() -> Unit)? = null
     var initialLabel: String? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = DialogTrackLabelBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -28,20 +42,20 @@ class SaveTrackDialog : DialogFragment(R.layout.dialog_track_label) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        save_button.setOnClickListener { validateLabelAndSave() }
-        discard_button.setOnClickListener {
+        binding.saveButton.setOnClickListener { validateLabelAndSave() }
+        binding.discardButton.setOnClickListener {
             discardCallback?.invoke()
             dismiss()
         }
-        input_label.setText(initialLabel ?: getString(R.string.default_track_name))
+        binding.inputLabel.setText(initialLabel ?: getString(R.string.default_track_name))
     }
 
     private fun validateLabelAndSave() {
-        val label = input_label.text.toString()
+        val label = binding.inputLabel.text.toString()
         when (TextUtils.isEmpty(label)) {
-            true -> input_label.error = getString(R.string.empty_label_validation)
+            true -> binding.inputLabel.error = getString(R.string.empty_label_validation)
             else -> {
-                saveCallback?.invoke(input_label.text.toString())
+                saveCallback?.invoke(binding.inputLabel.text.toString())
                 dismiss()
             }
         }

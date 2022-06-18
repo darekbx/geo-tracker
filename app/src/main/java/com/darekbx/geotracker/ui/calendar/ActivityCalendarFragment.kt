@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.model.DaySummary
 import com.darekbx.geotracker.viewmodels.TrackViewModel
@@ -19,13 +18,15 @@ import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.MonthHeaderFooterBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_activity_calendar.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.DayOfWeek
 import java.time.YearMonth
 import java.util.Calendar
 import android.text.style.UnderlineSpan
 import android.text.SpannableString
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import com.darekbx.geotracker.databinding.FragmentActivityCalendarBinding
 
 class DayViewContainer(view: View) : ViewContainer(view) {
     val dayTextView: TextView = view.findViewById(R.id.calendarDayText)
@@ -40,18 +41,30 @@ class MonthHeaderContainer(view: View) : ViewContainer(view) {
 @AndroidEntryPoint
 class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
 
+    private var _binding: FragmentActivityCalendarBinding? = null
+    private val binding get() = _binding!!
+
     private val tracksViewModel: TrackViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentActivityCalendarBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loading_view.visibility = View.VISIBLE
+        binding.loadingView.visibility = View.VISIBLE
 
         tracksViewModel.fetchDaySummaries()
-        tracksViewModel.daySummaries.observe(viewLifecycleOwner, Observer { daySummaries ->
+        tracksViewModel.daySummaries.observe(viewLifecycleOwner) { daySummaries ->
             createCalendar(daySummaries)
-            loading_view.visibility = View.GONE
-        })
+            binding.loadingView.visibility = View.GONE
+        }
     }
 
     private fun createCalendar(daySummaries: List<DaySummary>) {
@@ -59,17 +72,17 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
         val dayOfYear = calendar.get(Calendar.DAY_OF_YEAR)
         val year = calendar.get(Calendar.YEAR)
 
-        calendar_view.dayBinder = dayBinder(dayOfYear, year, daySummaries)
-        calendar_view.monthHeaderBinder = monthHeaderBinder(daySummaries)
+        binding.calendarView.dayBinder = dayBinder(dayOfYear, year, daySummaries)
+        binding.calendarView.monthHeaderBinder = monthHeaderBinder(daySummaries)
 
         val currentMonth = YearMonth.now()
         val firstMonth = currentMonth.minusMonths(10)
         val lastMonth = currentMonth.plusMonths(1)
-        calendar_view.setup(firstMonth, lastMonth, DayOfWeek.MONDAY)
-        calendar_view.scrollToMonth(currentMonth)
+        binding.calendarView.setup(firstMonth, lastMonth, DayOfWeek.MONDAY)
+        binding.calendarView.scrollToMonth(currentMonth)
 
         val daysOnBike = daySummaries.filter { it.dateFormatted.take(4).toInt() == year }.size
-        year_header.text = getString(R.string.calendar_year_header, daysOnBike)
+        binding.yearHeader.text = getString(R.string.calendar_year_header, daysOnBike)
     }
 
     private fun dayBinder(
@@ -158,7 +171,7 @@ class ActivityCalendarFragment : Fragment(R.layout.fragment_activity_calendar) {
                 val monthSummariesCount = monthSummaries.size
 
                 if (monthSummariesCount > 0) {
-                    val monthDistance = monthSummaries.sumByDouble { it.sumDistance }
+                    val monthDistance = monthSummaries.sumOf { it.sumDistance }
                     container.textView.text = getString(
                         R.string.calendar_month_format,
                         monthName,

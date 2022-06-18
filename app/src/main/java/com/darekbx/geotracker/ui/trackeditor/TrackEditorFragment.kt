@@ -10,7 +10,6 @@ import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
@@ -21,8 +20,6 @@ import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_all_tracks.*
-import kotlinx.android.synthetic.main.fragment_all_tracks.map
 import kotlinx.coroutines.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -54,10 +51,10 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tracksViewModel.pointsDeleteResult.observe(viewLifecycleOwner, Observer {
+        tracksViewModel.pointsDeleteResult.observe(viewLifecycleOwner) {
             hideProgress()
             Toast.makeText(requireContext(), R.string.points_deleted, Toast.LENGTH_SHORT).show()
-        })
+        }
 
         loadAllTracks()
         initializeMap()
@@ -131,11 +128,11 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
     }
 
     private fun SeekBar.increase() {
-        progress = progress + 1
+        progress++
     }
 
     private fun SeekBar.decrease() {
-        progress = progress - 1
+        progress--
     }
 
     private fun lockProgress(seekBar: SeekBar, oppositeSeekBar: SeekBar, progress: Int) {
@@ -157,7 +154,7 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
         showProgress()
         val trackId = arguments?.getLong(TrackFragment.TRACK_ID_KEY)
         if (trackId != null) {
-            tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
+            tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner) { track ->
                 trackToEdit = track
                 val simplePoints = track.points.map {
                     SimplePointDto(it.trackId, it.latitude, it.longitude)
@@ -165,7 +162,7 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
                 displayTrack(simplePoints, currentTrackStyle(), CUT_OVERLAY_ID)
                 fetchTracksWithPoints()
                 updateSummary()
-            })
+            }
         }
     }
 
@@ -191,16 +188,16 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
     }
 
     private fun fetchTracksWithPoints() {
-        tracksViewModel.fetchAllPoints(POINTS_TO_SKIP).observe(viewLifecycleOwner, Observer { grouppedPoints ->
+        tracksViewModel.fetchAllPoints(POINTS_TO_SKIP).observe(viewLifecycleOwner) { grouppedPoints ->
             for (points in grouppedPoints) {
                 if (trackToEdit?.id != points.key) {
                     displayTrack(points.value, otherTracksStyle())
                 }
             }
-            loading_view.visibility = View.GONE
-            map.invalidateMapCoordinates(map.projection.screenRect)
+            binding.loadingView.visibility = View.GONE
+            binding.map.invalidateMapCoordinates(binding.map.projection.screenRect)
             hideProgress()
-        })
+        }
     }
 
     private fun displayTrack(points: List<SimplePointDto>, trackStyle: TrackStyle, overlayId: String? = null) {
@@ -212,7 +209,7 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
 
         val mapPoints = points.map { point -> GeoPoint(point.latitude, point.longitude) }
         polyline.setPoints(mapPoints)
-        map.overlays.add(polyline)
+        binding.map.overlays.add(polyline)
     }
 
     private fun initializeMap() {

@@ -1,16 +1,18 @@
 package com.darekbx.geotracker.viewmodels
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.darekbx.geotracker.model.PlaceToVisit
 import com.darekbx.geotracker.repository.PlaceDao
 import com.darekbx.geotracker.repository.entities.PlaceDto
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.osmdroid.util.GeoPoint
+import javax.inject.Inject
 
-class PlacesToVisitViewModel @ViewModelInject constructor(
+@HiltViewModel
+class PlacesToVisitViewModel @Inject constructor(
     private val placeDao: PlaceDao
 ): ViewModel() {
 

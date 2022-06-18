@@ -5,20 +5,21 @@ import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
+import com.darekbx.geotracker.databinding.FragmentTrackBinding
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.ui.tracks.SaveTrackDialog
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_track.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -28,9 +29,21 @@ import org.osmdroid.views.overlay.Polyline
 @AndroidEntryPoint
 class TrackFragment : Fragment(R.layout.fragment_track) {
 
+    private var _binding: FragmentTrackBinding? = null
+    private val binding get() = _binding!!
+
     companion object {
         const val DEFAULT_MAP_ZOOM = 18.0
         const val TRACK_ID_KEY = "track_id_key"
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentTrackBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     private val tracksViewModel: TrackViewModel by viewModels()
@@ -38,35 +51,34 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tracksViewModel.updateResult.observe(viewLifecycleOwner, Observer {
+        tracksViewModel.updateResult.observe(viewLifecycleOwner) {
             loadTrack()
-        })
-        tracksViewModel.pointsDeleteResult.observe(viewLifecycleOwner, Observer {
+        }
+        tracksViewModel.pointsDeleteResult.observe(viewLifecycleOwner) {
             showDeleteTrackPointsSuccessDialog()
-        })
-        tracksViewModel.fixResult.observe(viewLifecycleOwner, Observer {
+        }
+        tracksViewModel.fixResult.observe(viewLifecycleOwner) {
             notifyFixed()
-        })
+        }
 
         loadTrack()
         initializeMap()
 
-        image_label_edit.setOnClickListener { editLabel() }
-        overlapping_button.setOnClickListener { displayOverlappingMap() }
-        clear_points_button.setOnClickListener { confirmDeleteTrackPoints() }
-        clear_points_button.setOnClickListener { confirmDeleteTrackPoints() }
-        fix_data_button.setOnClickListener { fixDate() }
-        edit_track_button.setOnClickListener { openTrackEditor() }
+        binding.imageLabelEdit.setOnClickListener { editLabel() }
+        binding.overlappingButton.setOnClickListener { displayOverlappingMap() }
+        binding.clearPointsButton.setOnClickListener { confirmDeleteTrackPoints() }
+        binding.fixDataButton.setOnClickListener { fixDate() }
+        binding.editTrackButton.setOnClickListener { openTrackEditor() }
     }
 
     override fun onResume() {
         super.onResume()
-        map.onResume()
+        binding.map.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        map.onPause()
+        binding.map.onPause()
     }
 
     private fun confirmDeleteTrackPoints() {
@@ -124,9 +136,9 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     private fun loadTrack() {
         arguments?.let { arguments ->
             val trackId = arguments.getLong(TRACK_ID_KEY)
-            tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner, Observer { track ->
+            tracksViewModel.fetchTrack(trackId).observe(viewLifecycleOwner) { track ->
                 displayTrack(track)
-            })
+            }
         }
     }
 
@@ -136,9 +148,9 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
-        map.setTileSource(TileSourceFactory.MAPNIK)
-        map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
-        map.setMultiTouchControls(true)
+        binding.map.setTileSource(TileSourceFactory.MAPNIK)
+        binding.map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
+        binding.map.setMultiTouchControls(true)
     }
 
     @SuppressLint("SetTextI18n")
@@ -150,38 +162,38 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
 
         val date = track.startTimestamp!!.split(" ")[0]
         val startTime = track.startTimestamp.split(" ")[1]
-        val endTime = when {
-            track.endTimestamp == null -> getString(R.string.empty)
+        val endTime = when (track.endTimestamp) {
+            null -> getString(R.string.empty)
             else -> track.endTimestamp.split(" ")[1]
         }
 
-        value_label.text = label
-        value_label_id.text = "id: ${track.id}"
-        value_date.text = date
-        value_start_time.text = startTime
-        value_end_time.text = endTime
-        value_time.text = "(${track.timeDifference})"
-        value_distance.text = getString(R.string.distance_format, track.distance)
-        fix_data_button.isVisible = track.isTimeBroken
+        binding.valueLabel.text = label
+        binding.valueLabelId.text = "id: ${track.id}"
+        binding.valueDate.text = date
+        binding.valueStartTime.text = startTime
+        binding.valueEndTime.text = endTime
+        binding.valueTime.text = "(${track.timeDifference})"
+        binding.valueDistance.text = getString(R.string.distance_format, track.distance)
+        binding.fixDataButton.isVisible = track.isTimeBroken
 
         if (track.points.isNotEmpty()) {
             displayFullTrackDetails(track)
         } else {
-            value_points.text = getString(R.string.points_deleted)
-            speed_view.values = emptyList()
-            altitude_view.values = emptyList()
-            map.visibility = View.INVISIBLE
-            edit_track_button.isVisible = false
+            binding.valuePoints.text = getString(R.string.points_deleted)
+            binding.speedView.values = emptyList()
+            binding.altitudeView.values = emptyList()
+            binding.map.visibility = View.INVISIBLE
+            binding.editTrackButton.isVisible = false
         }
     }
 
     private fun displayFullTrackDetails(track: Track) {
-        value_points.text = getString(R.string.points, track.points.size)
-        speed_view.values = track.points.map { it.speed }
-        altitude_view.values = track.points.map { it.altitude.toFloat() }
+        binding.valuePoints.text = getString(R.string.points, track.points.size)
+        binding.speedView.values = track.points.map { it.speed }
+        binding.altitudeView.values = track.points.map { it.altitude.toFloat() }
 
         track.points.firstOrNull()?.let { point ->
-            map.controller.apply {
+            binding.map.controller.apply {
                 setZoom(DEFAULT_MAP_ZOOM)
                 val startPoint = GeoPoint(point.latitude, point.longitude)
                 setCenter(startPoint)
@@ -193,14 +205,14 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             outlinePaint.strokeWidth = 6.0F
         }
 
-        map.overlays.add(polyline)
+        binding.map.overlays.add(polyline)
 
         val mapPoints = track.points.map { point -> GeoPoint(point.latitude, point.longitude) }
         polyline.setPoints(mapPoints)
     }
 
     private fun editLabel() {
-        val currentLabel = value_label.text.toString()
+        val currentLabel = binding.valueLabel.text.toString()
         val trackId = arguments?.getLong(TRACK_ID_KEY)
         SaveTrackDialog().apply {
             initialLabel = currentLabel

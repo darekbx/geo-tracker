@@ -1,6 +1,5 @@
 package com.darekbx.geotracker.viewmodels
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.darekbx.geotracker.model.DaySummary
 import com.darekbx.geotracker.model.RecordStatus
@@ -13,14 +12,17 @@ import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.geotracker.repository.entities.TrackPoints
 import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.utils.DateTimeUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class TrackViewModel @ViewModelInject constructor(
+@HiltViewModel
+class TrackViewModel @Inject constructor(
     private val trackDao: TrackDao,
     private val pointDao: PointDao,
     private val appPreferences: AppPreferences
@@ -58,7 +60,7 @@ class TrackViewModel @ViewModelInject constructor(
             val tracks = tracksFlow().toList()
             val sumDistances = tracks
                 .groupBy { it.startTimestamp!!.take(10) }
-                .mapValues { entry -> entry.value.sumByDouble { it.distance.toDouble() } }
+                .mapValues { entry -> entry.value.sumOf { it.distance.toDouble() } }
                 .map { DaySummary(it.key, it.value) }
             daySummaries.postValue(sumDistances)
         }
@@ -97,8 +99,8 @@ class TrackViewModel @ViewModelInject constructor(
     }
 
     private fun createPointScope(points: List<PointDto>): PointScope {
-        val startId = points.mapNotNull { it.id }.minBy { it } ?: 0L
-        val endId = points.mapNotNull { it.id }.maxBy { it } ?: 0L
+        val startId = points.mapNotNull { it.id }.minByOrNull { it } ?: 0L
+        val endId = points.mapNotNull { it.id }.maxByOrNull { it } ?: 0L
         return PointScope(startId, endId)
     }
 
@@ -156,7 +158,7 @@ class TrackViewModel @ViewModelInject constructor(
                     val speed = if (points.isEmpty()) 0.0F else points.last().speed
                     val time = (System.currentTimeMillis() - (track?.startTimestamp ?: 0L)) / 1000
 
-                    val maxPoint = points.maxBy { it.timestamp }
+                    val maxPoint = points.maxByOrNull { it.timestamp }
                     val location = maxPoint?.let { GeoPoint(maxPoint.latitude, maxPoint.longitude) }
                     postValue(RecordStatus(points.size, distance, averageSpeed, speed, time, location))
                 }

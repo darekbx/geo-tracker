@@ -47,8 +47,8 @@ class AltitudeView(context: Context, attributeSet: AttributeSet) : View(context,
         val width = width - leftPadding
 
         val count = values.count()
-        val maxValue = (values.max() ?: 1.0F)
-        val minValue = (values.min() ?: 1.0F)
+        val maxValue = (values.maxOrNull() ?: 1.0F)
+        val minValue = (values.minOrNull() ?: 1.0F)
         val widthRatio = width / count.toFloat()
         val heightRatio = height / (maxValue - minValue)
         val firstPoint = PointF(leftPadding, height - ((values.first() - minValue) * heightRatio))

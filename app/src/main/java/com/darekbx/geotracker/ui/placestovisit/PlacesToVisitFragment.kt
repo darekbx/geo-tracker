@@ -2,20 +2,21 @@ package com.darekbx.geotracker.ui.placestovisit
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
+import com.darekbx.geotracker.databinding.FragmentPlacesToVisitBinding
 import com.darekbx.geotracker.location.LastKnownLocation
 import com.darekbx.geotracker.model.PlaceToVisit
 import com.darekbx.geotracker.ui.alltracks.AllTracksFragment
 import com.darekbx.geotracker.viewmodels.PlacesToVisitViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_places_to_visit.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,19 +35,31 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PlacesToVisitFragment: Fragment(R.layout.fragment_places_to_visit) {
 
+    private var _binding: FragmentPlacesToVisitBinding? = null
+    private val binding get() = _binding!!
+
     @Inject
     lateinit var lastKnownLocation: LastKnownLocation
     private val placesToVisitViewModel: PlacesToVisitViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentPlacesToVisitBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initializeMap()
 
-        placesToVisitViewModel.listAll().observe(viewLifecycleOwner, Observer { places ->
+        placesToVisitViewModel.listAll().observe(viewLifecycleOwner) { places ->
             displayPlaces(places)
-            loading_view.visibility = View.GONE
-        })
+            binding.loadingView.visibility = View.GONE
+        }
     }
 
     private fun initializeMap() {
@@ -55,21 +68,21 @@ class PlacesToVisitFragment: Fragment(R.layout.fragment_places_to_visit) {
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
-        map.setTileSource(TileSourceFactory.MAPNIK)
-        map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
-        map.setMultiTouchControls(true)
+        binding.map.setTileSource(TileSourceFactory.MAPNIK)
+        binding.map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
+        binding.map.setMultiTouchControls(true)
 
     }
 
     private fun displayPlaces(places: List<PlaceToVisit>) {
-        map.overlays.clear()
-        map.overlays.add(touchOverlay)
+        binding.map.overlays.clear()
+        binding.map.overlays.add(touchOverlay)
 
         val geoPoints = mutableListOf<GeoPoint>()
 
         for (place in places) {
             val geoPoint = GeoPoint(place.latitude, place.longitude)
-            val marker = Marker(map).apply {
+            val marker = Marker(binding.map).apply {
                 id = "${place.id}"
                 position = geoPoint
                 title = place.label
@@ -80,7 +93,7 @@ class PlacesToVisitFragment: Fragment(R.layout.fragment_places_to_visit) {
                 true
             }
             geoPoints.add(geoPoint)
-            map.overlays.add(marker)
+            binding.map.overlays.add(marker)
         }
 
         when (geoPoints.size) {
@@ -92,7 +105,7 @@ class PlacesToVisitFragment: Fragment(R.layout.fragment_places_to_visit) {
 
     private fun zoomToManyPoints(geoPoints: MutableList<GeoPoint>) {
         val boundingBox = BoundingBox.fromGeoPointsSafe(geoPoints)
-        map.zoomToBoundingBox(boundingBox, true, 100)
+        binding.map.zoomToBoundingBox(boundingBox, true, 100)
     }
 
     @SuppressLint("MissingPermission")
@@ -101,7 +114,7 @@ class PlacesToVisitFragment: Fragment(R.layout.fragment_places_to_visit) {
             val location = lastKnownLocation.getLocation()
             if (location != null) {
                 withContext(Dispatchers.Main) {
-                    map.controller.apply {
+                    binding.map.controller.apply {
                         setZoom(AllTracksFragment.DEFAULT_MAP_ZOOM)
                         val startPoint = GeoPoint(location.latitude, location.longitude)
                         setCenter(startPoint)
@@ -112,7 +125,7 @@ class PlacesToVisitFragment: Fragment(R.layout.fragment_places_to_visit) {
     }
 
     private fun zoomToSinglePoint(geoPoint: GeoPoint) {
-        map.controller.apply {
+        binding.map.controller.apply {
             setZoom(AllTracksFragment.DEFAULT_MAP_ZOOM)
             setCenter(geoPoint)
         }
