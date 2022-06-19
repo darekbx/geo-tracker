@@ -371,27 +371,25 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         }
     }
 
-    private val fineLocation by lazy {
+    private val fineLocation =
         PermissionRequester(
-            activity,
+            this,
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ),
             onDenied = { showPermissionsDeniedDialog() }
         )
-    }
 
-    private val backgroundLocation by lazy {
+    private val backgroundLocation =
         PermissionRequester(
-            activity,
+            this,
             arrayOf(
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
                 Manifest.permission.FOREGROUND_SERVICE
             ),
             onDenied = { showPermissionsDeniedDialog() }
         )
-    }
 
     private val trackAdapter by lazy {
         TrackAdapter(context).apply {

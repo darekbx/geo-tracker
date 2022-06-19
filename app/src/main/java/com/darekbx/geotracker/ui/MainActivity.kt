@@ -14,12 +14,14 @@ import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransitionRequest
 import com.google.android.gms.location.ActivityRecognition
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     companion object {
-        val TAG = "MainActivity"
+        const val TAG = "MainActivity"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             action = ActivityTranstionReceiver.ACTION
         }
         val pendingIntent = PendingIntent
-            .getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            .getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val task = ActivityRecognition.getClient(applicationContext)
             .requestActivityTransitionUpdates(transitionRequest, pendingIntent)

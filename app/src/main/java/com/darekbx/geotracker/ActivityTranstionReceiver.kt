@@ -7,12 +7,14 @@ import android.util.Log
 import com.darekbx.geotracker.location.ForegroundTracker
 import com.darekbx.geotracker.utils.AppPreferences
 import com.google.android.gms.location.ActivityTransitionResult
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class ActivityTranstionReceiver : BroadcastReceiver() {
 
     companion object {
-        val ACTION = "OnBicycleActivityAction"
-        val TAG = "ActivityTranstionReceiver"
+        const val ACTION = "OnBicycleActivityAction"
+        const val TAG = "ActivityTranstionReceiver"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -21,8 +23,7 @@ class ActivityTranstionReceiver : BroadcastReceiver() {
             Log.d(TAG, "Transition received")
             val result = ActivityTransitionResult.extractResult(intent) ?: return
             if (result.transitionEvents.isNotEmpty() && !ForegroundTracker.IS_RUNNING) {
-                val intent = Intent(context, ForegroundTracker::class.java)
-                context?.startForegroundService(intent)
+                context.startForegroundService(Intent(context, ForegroundTracker::class.java))
             }
         }
     }

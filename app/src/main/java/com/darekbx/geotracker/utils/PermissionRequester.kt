@@ -1,10 +1,10 @@
 package com.darekbx.geotracker.utils
 
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 
 class PermissionRequester(
-    val activity: FragmentActivity?,
+    val fragment: Fragment,
     private val permissions: Array<String>,
     val onDenied: () -> Unit = { }
 ) {
@@ -12,7 +12,7 @@ class PermissionRequester(
     private var onGranted: () -> Unit = { }
 
     private val requestPermissionLauncher =
-        activity?.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
+        fragment.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
         { permissions ->
             when {
                 permissions.all { it.value } -> onGranted()
@@ -22,6 +22,6 @@ class PermissionRequester(
 
     fun runWithPermission(onGranted: () -> Unit) {
         this.onGranted = onGranted
-        requestPermissionLauncher?.launch(permissions)
+        requestPermissionLauncher.launch(permissions)
     }
 }

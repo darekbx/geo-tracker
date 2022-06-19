@@ -30,22 +30,28 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         const val DB_NAME = "geo_tracker"
 
-        fun restoreDataFromBackup(context: Context, sourcePath: String, callback: (success: Boolean) -> Unit) {
+        fun restoreDataFromBackup(
+            context: Context,
+            sourcePath: String,
+            callback: (success: Boolean) -> Unit
+        ) {
             CoroutineScope(Dispatchers.IO).launch {
-                val databaseFile = context.getDatabasePath(DB_NAME)
-                try {
-                    if (databaseFile.exists()) {
-                        context.deleteDatabase(DB_NAME)
-                    }
-                    FileInputStream(sourcePath).use { inStream ->
-                        FileOutputStream(databaseFile.toString()).use { outStream ->
-                            FileUtils.copy(inStream, outStream)
-                            callback(true)
+                kotlin.runCatching {
+                    val databaseFile = context.getDatabasePath(DB_NAME)
+                    try {
+                        if (databaseFile.exists()) {
+                            context.deleteDatabase(DB_NAME)
                         }
+                        FileInputStream(sourcePath).use { inStream ->
+                            FileOutputStream(databaseFile.toString()).use { outStream ->
+                                FileUtils.copy(inStream, outStream)
+                                callback(true)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        callback(false)
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    callback(false)
                 }
             }
         }
@@ -56,7 +62,8 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun makeBackup(context: Context, callback: (path: String?) -> Unit) {
             try {
-                val currentDate = SimpleDateFormat("yyyyMMdd_HHmm").format(Calendar.getInstance().timeInMillis)
+                val currentDate =
+                    SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(Calendar.getInstance().timeInMillis)
                 val outFile = "geotracker_db_$currentDate.sqlite"
                 val databaseFile = context.getDatabasePath(DB_NAME)
                 val contentValues = contentValuesOf(
@@ -65,17 +72,19 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                 context.contentResolver.run {
                     CoroutineScope(Dispatchers.IO).launch {
-                        insert(
-                            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-                            contentValues
-                        )?.let { uri ->
-                            openOutputStream(uri)?.use { outStream ->
-                                FileInputStream(databaseFile).use { inStream ->
-                                    FileUtils.copy(inStream, outStream)
-                                    callback(uri.path)
-                                }
+                        kotlin.runCatching {
+                            insert(
+                                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                                contentValues
+                            )?.let { uri ->
+                                openOutputStream(uri)?.use { outStream ->
+                                    FileInputStream(databaseFile).use { inStream ->
+                                        FileUtils.copy(inStream, outStream)
+                                        callback(uri.path)
+                                    }
+                                } ?: callback(null)
                             } ?: callback(null)
-                        } ?: callback(null)
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -86,14 +95,16 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("""
+                database.execSQL(
+                    """
 CREATE TABLE IF NOT EXISTS `place` (
     `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
     `label` TEXT NOT NULL, 
     `latitude` REAL NOT NULL, 
     `longitude` REAL NOT NULL, 
     `timestamp` INTEGER NOT NULL
-)""")
+)"""
+                )
             }
         }
     }
