@@ -11,6 +11,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.darekbx.geotracker.repository.entities.PlaceDto
 import com.darekbx.geotracker.repository.entities.PointDto
+import com.darekbx.geotracker.repository.entities.RouteDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,8 +22,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Database(
-    entities = [PointDto::class, TrackDto::class, PlaceDto::class],
-    version = 2,
+    entities = [PointDto::class, TrackDto::class, PlaceDto::class, RouteDto::class],
+    version = 3,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -107,9 +108,22 @@ CREATE TABLE IF NOT EXISTS `place` (
                 )
             }
         }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+CREATE TABLE IF NOT EXISTS `route` (
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT, 
+    `label` TEXT NOT NULL, 
+    `url` TEXT NOT NULL, 
+    `timestamp` INTEGER NOT NULL
+)""")
+            }
+        }
     }
 
     abstract fun trackDao(): TrackDao
     abstract fun pointDao(): PointDao
     abstract fun placeDao(): PlaceDao
+    abstract fun routeDao(): RouteDao
 }

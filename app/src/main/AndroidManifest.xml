@@ -23,7 +23,10 @@
         android:theme="@style/Theme.App.Starting"
         android:name=".GeoTrackerApplication"
         android:requestLegacyExternalStorage="true">
-        <activity android:name=".ui.MainActivity" android:screenOrientation="portrait">
+        <activity
+            android:name=".ui.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -41,6 +44,7 @@
 
         <service
             android:name=".location.ForegroundTracker"
+            android:exported="false"
             android:foregroundServiceType="location" />
     </application>
 

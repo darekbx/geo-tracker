@@ -39,6 +39,10 @@ object CommonModule {
 
     @Singleton
     @Provides
+    fun provideRouteDao(db: AppDatabase) = db.routeDao()
+
+    @Singleton
+    @Provides
     fun provideTracker(): ILiveTracker = HerokuLiveTracker()
 
     @Singleton

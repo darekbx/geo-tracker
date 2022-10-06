@@ -42,6 +42,9 @@
         <action
             android:id="@+id/action_tracksFragment_to_placesToVisitFragment"
             app:destination="@id/placesToVisitFragment" />
+        <action
+            android:id="@+id/action_tracksFragment_to_routesFragment"
+            app:destination="@id/routesFragment" />
     </fragment>
     <fragment
         android:id="@+id/allTracksFragment"
@@ -63,4 +66,8 @@
         android:name="com.darekbx.geotracker.ui.placestovisit.PlacesToVisitFragment"
         android:label="PlacesToVisitFragment"
         tools:layout="@layout/fragment_places_to_visit"/>
+    <fragment
+        android:id="@+id/routesFragment"
+        android:name="com.darekbx.geotracker.ui.routes.RoutesFragment"
+        android:label="RoutesFragment" />
 </navigation>

@@ -24,6 +24,7 @@ import com.darekbx.geotracker.utils.DateTimeUtils
 import com.darekbx.geotracker.utils.LocationUtils
 import com.darekbx.geotracker.utils.PermissionRequester
 import com.darekbx.geotracker.viewmodels.PlacesToVisitViewModel
+import com.darekbx.geotracker.viewmodels.RoutesViewModel
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -57,6 +58,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private val tracksViewModel: TrackViewModel by viewModels()
     private val placesToVisitViewModel: PlacesToVisitViewModel by viewModels()
+    private val routesViewModel: RoutesViewModel by viewModels()
     private var currentTrackId: Long? = null
     private var miniMapMarker: Marker? = null
 
@@ -94,6 +96,11 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         binding.buttonPlacesToVisit.setOnClickListener {
             findNavController()
                 .navigate(R.id.action_tracksFragment_to_placesToVisitFragment)
+        }
+
+        binding.buttonRoutes.setOnClickListener {
+            findNavController()
+                .navigate(R.id.action_tracksFragment_to_routesFragment)
         }
 
         binding.tracksList.setAdapter(trackAdapter)
@@ -151,6 +158,10 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun registerViewModel() {
         placesToVisitViewModel.countAll().observe(viewLifecycleOwner) {
             binding.placesToVisitCount.text = "$it"
+        }
+
+        routesViewModel.countAll().observe(viewLifecycleOwner) {
+            binding.routesCount.text = "$it"
         }
 
         tracksViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
