@@ -19,7 +19,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -27,6 +26,16 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     @Inject
     lateinit var appPreferences: AppPreferences
+
+    private val storagePermission =
+        PermissionRequester(
+            this,
+            arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ),
+            onDenied = { showPermissionsDeniedDialog() }
+        )
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_main, rootKey)
@@ -143,16 +152,5 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             .setMessage(R.string.permissions_are_required)
             .setPositiveButton(R.string.button_ok, null)
             .show()
-    }
-
-    private val storagePermission by lazy {
-        PermissionRequester(
-            this,
-            arrayOf(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ),
-            onDenied = { showPermissionsDeniedDialog() }
-        )
     }
 }

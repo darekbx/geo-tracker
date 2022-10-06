@@ -38,6 +38,9 @@ ORDER BY track.id DESC
     @Query("UPDATE track SET end_timestamp = :endTimestamp WHERE id = :trackId")
     fun update(trackId: Long, endTimestamp: Long)
 
+    @Query("UPDATE track SET distance = :distance WHERE id = :trackId")
+    fun updateDistance(trackId: Long, distance: Float)
+
     @Query("UPDATE track SET distance = distance + :distance WHERE id = :trackId")
     fun appendDistance(trackId: Long, distance: Float)
 

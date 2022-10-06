@@ -18,6 +18,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -41,6 +42,12 @@ class TrackViewModel @Inject constructor(
     var pointsDeleteResult = MutableLiveData<Boolean>()
     var fixResult = MutableLiveData<Boolean>()
     var trackLoadingStatus = MutableLiveData<Boolean>()
+
+    fun fix() {
+        ioScope.launch {
+            trackDao.updateDistance(816, 44070.00F)
+        }
+    }
 
     @ExperimentalCoroutinesApi
     fun fetchTracks() {

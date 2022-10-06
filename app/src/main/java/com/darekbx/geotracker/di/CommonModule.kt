@@ -23,6 +23,7 @@ object CommonModule {
         Room
             .databaseBuilder(context, AppDatabase::class.java, AppDatabase.DB_NAME)
             .addMigrations(AppDatabase.MIGRATION_1_2)
+            .addMigrations(AppDatabase.MIGRATION_2_3)
             .build()
 
     @Singleton
