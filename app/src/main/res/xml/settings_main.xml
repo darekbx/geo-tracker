@@ -3,6 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
         android:title="@string/settings_gps_category">
+        <DropDownPreference
+            android:key="map_style"
+            android:title="@string/settings_map_style_title"
+            android:entries="@array/settings_map_styles"
+            app:useSimpleSummaryProvider="true"
+            android:defaultValue="@string/default_map_style"
+            android:entryValues="@array/settings_map_styles_ids"
+            />
         <EditTextPreference
             android:key="gps_update_interval_key"
             android:title="@string/settings_interval"

@@ -17,6 +17,7 @@ import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.databinding.FragmentTrackBinding
 import com.darekbx.geotracker.model.Track
+import com.darekbx.geotracker.ui.MapStyle
 import com.darekbx.geotracker.ui.tracks.SaveTrackDialog
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,6 +26,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Polyline
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TrackFragment : Fragment(R.layout.fragment_track) {
@@ -47,6 +49,9 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     }
 
     private val tracksViewModel: TrackViewModel by viewModels()
+
+    @Inject
+    lateinit var mapStyle: MapStyle
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -148,6 +153,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
+        mapStyle.applyMapStyle(binding.map)
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         binding.map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
         binding.map.setMultiTouchControls(true)

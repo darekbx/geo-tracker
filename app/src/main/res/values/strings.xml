@@ -82,4 +82,17 @@
     <string name="settings_backup_error">Unable to make a backup, check logs for more details!</string>
     <string name="settings_restore_success">Data was restored!</string>
     <string name="settings_restore_error">Unable to make restore data, check logs for more details!</string>
+    <string name="settings_map_style_title">Map style</string>
+
+    <string-array name="settings_map_styles">
+        <item>Classic</item>
+        <item>Dark</item>
+        <item>Custom</item>
+    </string-array>
+
+    <string-array name="settings_map_styles_ids">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

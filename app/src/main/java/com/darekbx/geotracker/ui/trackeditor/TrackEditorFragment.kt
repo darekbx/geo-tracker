@@ -17,6 +17,7 @@ import com.darekbx.geotracker.databinding.FragmentTrackEditorBinding
 import com.darekbx.geotracker.location.LastKnownLocation
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.entities.SimplePointDto
+import com.darekbx.geotracker.ui.MapStyle
 import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +37,8 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
     private val binding get() = _binding!!
 
     @Inject lateinit var lastKnownLocation: LastKnownLocation
+    @Inject lateinit var mapStyle: MapStyle
+
     private val tracksViewModel: TrackViewModel by viewModels()
     private var trackToEdit: Track? = null
 
@@ -218,6 +221,7 @@ class TrackEditorFragment: Fragment(R.layout.fragment_track_editor) {
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
+        mapStyle.applyMapStyle(binding.map)
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         binding.map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
         binding.map.setMultiTouchControls(true)

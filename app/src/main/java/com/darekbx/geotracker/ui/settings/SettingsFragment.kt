@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.FileUtils
 import android.text.format.Formatter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -103,6 +102,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 val defaultValue = resources.getBoolean(R.bool.default_live_tracking)
                 appPreferences.liveTracking =
                     sharedPreferences?.getBoolean(key, defaultValue) ?: defaultValue
+            }
+            AppPreferences.MAP_STYLE_KEY -> {
+                val defaultValue = resources.getString(R.string.default_map_style).toInt()
+                appPreferences.mapStyle =
+                    sharedPreferences?.getString(key, "$defaultValue")?.toInt() ?: defaultValue
             }
         }
     }

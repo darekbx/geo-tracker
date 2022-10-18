@@ -15,7 +15,17 @@ class AppPreferences @Inject constructor(@ApplicationContext val context: Contex
         const val LIVE_TRACKING_KEY = "live_tracking"
         const val ACTIVITY_DETECTION_KEY = "activity_detection"
         const val NTH_POINTS_TO_SKIP = "nth_points_to_skip"
+        const val MAP_STYLE_KEY = "map_style"
     }
+
+    var mapStyle: Int
+        get() {
+            val defaultValue = context.resources.getString(R.string.default_map_style)
+            return preferences.getString(MAP_STYLE_KEY, defaultValue)!!.toInt()
+        }
+        set(value) {
+            preferences.edit().putString(MAP_STYLE_KEY, value.toString()).apply()
+        }
 
     var nthPointsToSkip: Int
         get() {

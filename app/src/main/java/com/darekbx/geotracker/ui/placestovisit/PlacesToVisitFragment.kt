@@ -14,6 +14,7 @@ import com.darekbx.geotracker.R
 import com.darekbx.geotracker.databinding.FragmentPlacesToVisitBinding
 import com.darekbx.geotracker.location.LastKnownLocation
 import com.darekbx.geotracker.model.PlaceToVisit
+import com.darekbx.geotracker.ui.MapStyle
 import com.darekbx.geotracker.ui.alltracks.AllTracksFragment
 import com.darekbx.geotracker.viewmodels.PlacesToVisitViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,6 +41,10 @@ class PlacesToVisitFragment: Fragment(R.layout.fragment_places_to_visit) {
 
     @Inject
     lateinit var lastKnownLocation: LastKnownLocation
+
+    @Inject
+    lateinit var mapStyle: MapStyle
+
     private val placesToVisitViewModel: PlacesToVisitViewModel by viewModels()
 
     override fun onCreateView(
@@ -68,6 +73,7 @@ class PlacesToVisitFragment: Fragment(R.layout.fragment_places_to_visit) {
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
+        mapStyle.applyMapStyle(binding.map)
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         binding.map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
         binding.map.setMultiTouchControls(true)

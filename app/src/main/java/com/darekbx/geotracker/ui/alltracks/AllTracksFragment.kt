@@ -2,8 +2,6 @@ package com.darekbx.geotracker.ui.alltracks
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +15,7 @@ import com.darekbx.geotracker.databinding.FragmentAllTracksBinding
 import com.darekbx.geotracker.location.LastKnownLocation
 import com.darekbx.geotracker.model.Track
 import com.darekbx.geotracker.repository.entities.SimplePointDto
+import com.darekbx.geotracker.ui.MapStyle
 import com.darekbx.geotracker.ui.track.TrackFragment
 import com.darekbx.geotracker.viewmodels.TrackViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,6 +45,10 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
 
     @Inject
     lateinit var lastKnownLocation: LastKnownLocation
+
+    @Inject
+    lateinit var mapStyle: MapStyle
+
     private val tracksViewModel: TrackViewModel by viewModels()
     private var trackToOverlap: Track? = null
 
@@ -108,6 +111,7 @@ class AllTracksFragment : Fragment(R.layout.fragment_all_tracks) {
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
+        mapStyle.applyMapStyle(binding.map)
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         binding.map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
         binding.map.setMultiTouchControls(true)

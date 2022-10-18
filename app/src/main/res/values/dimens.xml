@@ -12,6 +12,7 @@
     <integer name="default_gps_distance">30</integer>
     <integer name="default_min_notification_distance">250</integer>
     <integer name="default_nth_points_to_skip">5</integer>
+    <string name="default_map_style">0</string>
     <bool name="default_live_tracking">false</bool>
     <bool name="default_activity_detection">true</bool>
 
