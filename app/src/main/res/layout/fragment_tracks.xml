@@ -206,10 +206,10 @@
             app:layout_constraintBottom_toTopOf="@id/mini_map"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="@dimen/padding_medium_24"
-            android:layout_marginStart="@dimen/padding_large"
-            android:layout_marginEnd="@dimen/padding_large"
-            android:padding="@dimen/padding_medium"
+            android:layout_marginTop="@dimen/padding_small"
+            android:layout_marginStart="@dimen/padding_small"
+            android:layout_marginEnd="@dimen/padding_small"
+            android:padding="@dimen/padding_small"
             android:background="@color/colorPrimary">
             <TextView
                 android:id="@+id/recording_progress"
@@ -238,9 +238,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/record_container"
             app:layout_constraintBottom_toTopOf="@id/label_container"
-            android:layout_marginTop="@dimen/padding_medium"
-            android:layout_marginStart="@dimen/padding_large"
-            android:layout_marginEnd="@dimen/padding_large"
+            android:layout_marginTop="@dimen/padding_small"
+            android:layout_marginStart="@dimen/padding_small"
+            android:layout_marginEnd="@dimen/padding_small"
             android:padding="@dimen/padding_medium"
             android:background="@color/colorPrimary"
             />
@@ -254,9 +254,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="@dimen/padding_large"
-            android:layout_marginStart="@dimen/padding_large"
-            android:layout_marginEnd="@dimen/padding_large"
-            android:layout_marginTop="@dimen/padding_medium"
+            android:layout_marginStart="@dimen/padding_small"
+            android:layout_marginEnd="@dimen/padding_small"
+            android:layout_marginTop="@dimen/padding_small"
             android:padding="@dimen/padding_medium"
             android:background="@color/colorPrimary">
 
