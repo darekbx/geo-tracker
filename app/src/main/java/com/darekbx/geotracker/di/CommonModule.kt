@@ -6,6 +6,7 @@ import com.darekbx.geotracker.livetracking.ILiveTracker
 import com.darekbx.geotracker.livetracking.HerokuLiveTracker
 import com.darekbx.geotracker.location.LastKnownLocation
 import com.darekbx.geotracker.repository.AppDatabase
+import com.darekbx.geotracker.utils.GpxReader
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,6 +26,10 @@ object CommonModule {
             .addMigrations(AppDatabase.MIGRATION_1_2)
             .addMigrations(AppDatabase.MIGRATION_2_3)
             .build()
+
+    @Singleton
+    @Provides
+    fun provideGpxReader() = GpxReader()
 
     @Singleton
     @Provides

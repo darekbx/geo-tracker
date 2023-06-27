@@ -360,6 +360,18 @@
             android:layout_margin="@dimen/padding_small"
             />
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_record_gpx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/button_record"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="@dimen/padding_medium"
+            android:layout_marginEnd="@dimen/padding_small"
+            app:backgroundTint="@android:color/white"
+            android:src="@drawable/ic_record_gpx"
+            android:translationZ="101dp"
+            />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/button_record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

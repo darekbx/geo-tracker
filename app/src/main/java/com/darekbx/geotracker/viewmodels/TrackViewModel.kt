@@ -1,5 +1,8 @@
 package com.darekbx.geotracker.viewmodels
 
+import android.content.ContentResolver
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.*
 import com.darekbx.geotracker.model.DaySummary
 import com.darekbx.geotracker.model.RecordStatus
@@ -12,13 +15,14 @@ import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.geotracker.repository.entities.TrackPoints
 import com.darekbx.geotracker.utils.AppPreferences
 import com.darekbx.geotracker.utils.DateTimeUtils
+import com.darekbx.geotracker.utils.Gpx
+import com.darekbx.geotracker.utils.GpxReader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -26,7 +30,8 @@ import javax.inject.Inject
 class TrackViewModel @Inject constructor(
     private val trackDao: TrackDao,
     private val pointDao: PointDao,
-    private val appPreferences: AppPreferences
+    private val appPreferences: AppPreferences,
+    private val gpxReader: GpxReader,
 ) : BaseViewModel() {
 
     data class PointScope(val idFrom: Long, val idTo: Long)
@@ -43,10 +48,27 @@ class TrackViewModel @Inject constructor(
     var fixResult = MutableLiveData<Boolean>()
     var trackLoadingStatus = MutableLiveData<Boolean>()
 
+    var gpxTrack: Gpx? = null
+
     fun fix() {
         ioScope.launch {
             trackDao.updateDistance(816, 44070.00F)
         }
+    }
+
+    fun readGpx(uri: Uri, contentResolver: ContentResolver): Boolean {
+        contentResolver
+            .openInputStream(uri)
+            ?.use { stream ->
+                try {
+                    val gpx = gpxReader.readGpx(stream)
+                    gpxTrack = gpx
+                    return gpx.points.isNotEmpty()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    return false
+                }
+            } ?: return false
     }
 
     @ExperimentalCoroutinesApi

@@ -2,11 +2,21 @@ package com.darekbx.geotracker.ui.tracks
 
 import android.Manifest
 import android.content.*
+import android.database.Cursor
 import android.graphics.Color
+import android.graphics.Paint
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.DocumentsContract
+import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -34,6 +44,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
+import java.io.InputStream
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
@@ -45,6 +56,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     companion object {
         const val STOP_ACTION = "stop_action"
         const val DEFAULT_MAP_ZOOM = 16.0
+        const val PICK_GPX_FILE = 2
     }
 
     override fun onCreateView(
@@ -147,6 +159,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun checkLocationEnabled(context: Context) {
         val locationEnabled = LocationUtils.isLocationEnabled(context)
         binding.buttonRecord.isEnabled = locationEnabled
+        binding.buttonRecordGpx.isEnabled = locationEnabled
         if (!locationEnabled) {
             AlertDialog.Builder(context)
                 .setMessage(R.string.location_is_not_enabled)
@@ -198,6 +211,13 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 }
             }
         }
+        binding.buttonRecordGpx.setOnClickListener {
+            fineLocation.runWithPermission {
+                backgroundLocation.runWithPermission {
+                    openFile()
+                }
+            }
+        }
 
         binding.buttonStop.setOnClickListener {
             stopTracking()
@@ -242,13 +262,29 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun fetchTracksWithPoints() {
         binding.miniMap.overlays.clear()
-        tracksViewModel.fetchAllPoints().observe(viewLifecycleOwner) { grouppedPoints ->
-            for (points in grouppedPoints) {
-                displayTrack(points.value)
+
+        // Load GPX track
+        tracksViewModel.gpxTrack?.let { gpx ->
+            val polyline = Polyline().apply {
+                outlinePaint.color = Color.BLUE
+                outlinePaint.strokeWidth = 8.0F
+                outlinePaint.isAntiAlias = true
+                outlinePaint.strokeJoin = Paint.Join.ROUND
             }
-            binding.miniMap.invalidateMapCoordinates(binding.miniMap.projection.screenRect)
-            binding.miniMap.overlays.add(miniMapMarker)
+
+            polyline.setPoints(gpx.points)
+            binding.miniMap.overlays.add(polyline)
         }
+        // Or display all routes
+            ?: run {
+                tracksViewModel.fetchAllPoints().observe(viewLifecycleOwner) { grouppedPoints ->
+                    for (points in grouppedPoints) {
+                        displayTrack(points.value)
+                    }
+                    binding.miniMap.invalidateMapCoordinates(binding.miniMap.projection.screenRect)
+                    binding.miniMap.overlays.add(miniMapMarker)
+                }
+            }
     }
 
     private fun displayTrack(points: List<SimplePointDto>, color: Int = Color.RED) {
@@ -372,12 +408,30 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
             isRecording -> {
                 binding.buttonStop.show()
                 binding.buttonRecord.hide()
+                binding.buttonRecordGpx.hide()
                 binding.statusContainer.visibility = View.VISIBLE
             }
             else -> {
                 binding.buttonStop.hide()
                 binding.buttonRecord.show()
+                binding.buttonRecordGpx.show()
                 binding.statusContainer.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun openFile() {
+        openFile.launch(arrayOf("*/*"))
+    }
+
+    private val openFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { result ->
+        result?.let { uri ->
+            val result = tracksViewModel.readGpx(uri, requireContext().contentResolver)
+            if (result) {
+                setUIMode(isRecording = true)
+                tracksViewModel.createNewTrack()
+            } else {
+                Toast.makeText(requireContext(), "Invalid file!", Toast.LENGTH_SHORT).show()
             }
         }
     }
