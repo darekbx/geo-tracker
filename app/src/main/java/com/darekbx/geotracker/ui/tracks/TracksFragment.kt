@@ -281,10 +281,11 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                     for (points in grouppedPoints) {
                         displayTrack(points.value)
                     }
-                    binding.miniMap.invalidateMapCoordinates(binding.miniMap.projection.screenRect)
-                    binding.miniMap.overlays.add(miniMapMarker)
                 }
             }
+
+        binding.miniMap.invalidateMapCoordinates(binding.miniMap.projection.screenRect)
+        binding.miniMap.overlays.add(miniMapMarker)
     }
 
     private fun displayTrack(points: List<SimplePointDto>, color: Int = Color.RED) {
