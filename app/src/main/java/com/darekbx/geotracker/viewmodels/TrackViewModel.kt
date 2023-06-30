@@ -56,6 +56,9 @@ class TrackViewModel @Inject constructor(
         }
     }
 
+    /**
+     * TODO: run in background thread!
+     */
     fun readGpx(uri: Uri, contentResolver: ContentResolver): Boolean {
         contentResolver
             .openInputStream(uri)

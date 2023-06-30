@@ -48,7 +48,6 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     companion object {
         const val STOP_ACTION = "stop_action"
         const val DEFAULT_MAP_ZOOM = 16.0
-        const val PICK_GPX_FILE = 2
     }
 
     override fun onCreateView(
