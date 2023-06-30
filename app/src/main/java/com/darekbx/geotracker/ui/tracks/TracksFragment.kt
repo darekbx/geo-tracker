@@ -2,21 +2,14 @@ package com.darekbx.geotracker.ui.tracks
 
 import android.Manifest
 import android.content.*
-import android.database.Cursor
 import android.graphics.Color
 import android.graphics.Paint
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
-import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -44,7 +37,6 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
-import java.io.InputStream
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
@@ -263,26 +255,25 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
     private fun fetchTracksWithPoints() {
         binding.miniMap.overlays.clear()
 
-        // Load GPX track
-        tracksViewModel.gpxTrack?.let { gpx ->
-            val polyline = Polyline().apply {
-                outlinePaint.color = Color.BLUE
-                outlinePaint.strokeWidth = 8.0F
-                outlinePaint.isAntiAlias = true
-                outlinePaint.strokeJoin = Paint.Join.ROUND
+        // Display all routes
+        tracksViewModel.fetchAllPoints().observe(viewLifecycleOwner) { grouppedPoints ->
+            for (points in grouppedPoints) {
+                displayTrack(points.value)
             }
 
-            polyline.setPoints(gpx.points)
-            binding.miniMap.overlays.add(polyline)
-        }
-        // Or display all routes
-            ?: run {
-                tracksViewModel.fetchAllPoints().observe(viewLifecycleOwner) { grouppedPoints ->
-                    for (points in grouppedPoints) {
-                        displayTrack(points.value)
-                    }
+            // Load GPX track
+            tracksViewModel.gpxTrack?.let { gpx ->
+                val polyline = Polyline().apply {
+                    outlinePaint.color = Color.BLUE
+                    outlinePaint.strokeWidth = 12.0F
+                    outlinePaint.isAntiAlias = true
+                    outlinePaint.strokeJoin = Paint.Join.ROUND
                 }
+
+                polyline.setPoints(gpx.points)
+                binding.miniMap.overlays.add(polyline)
             }
+        }
 
         binding.miniMap.invalidateMapCoordinates(binding.miniMap.projection.screenRect)
         binding.miniMap.overlays.add(miniMapMarker)
@@ -303,7 +294,6 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         tracksViewModel.recordStatus?.observe(viewLifecycleOwner) { recordStatus ->
             binding.distanceValue.text = getString(R.string.distance_format, recordStatus.distance)
             binding.speedValue.text = getString(R.string.speed_format, recordStatus.speed * 3.6F)
-            binding.avgSpeedValue.text = getString(R.string.speed_format, recordStatus.averageSpeed * 3.6F)
             binding.timeValue.text = DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
 
             if (miniMapMarker != null && recordStatus.location != null) {

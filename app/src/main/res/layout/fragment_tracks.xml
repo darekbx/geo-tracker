@@ -300,30 +300,10 @@
                 />
 
             <TextView
-                android:id="@+id/avg_speed_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/speed_value"
-                app:layout_constraintStart_toStartOf="parent"
-                android:text="@string/avg_speed"
-                android:layout_marginTop="@dimen/padding_small"
-                style="@style/default_label"
-                />
-            <TextView
-                android:id="@+id/avg_speed_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/avg_speed_label"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="15.99km\\h"
-                style="@style/default_label_value"
-                />
-
-            <TextView
                 android:id="@+id/time_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/avg_speed_value"
+                app:layout_constraintTop_toBottomOf="@id/speed_value"
                 app:layout_constraintStart_toStartOf="parent"
                 android:text="@string/time"
                 android:layout_marginTop="@dimen/padding_small"
