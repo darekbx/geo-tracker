@@ -1,12 +1,13 @@
 package com.darekbx.geotracker.utils
 
+import android.location.Location
 import android.util.Log
 import org.osmdroid.util.GeoPoint
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.InputStream
 
-data class Gpx(val name: String, val points: List<GeoPoint>)
+data class Gpx(val name: String, val points: List<GeoPoint>, val distance: Double)
 
 class GpxReader {
 
@@ -35,8 +36,9 @@ class GpxReader {
                         }
                     }
                 }
+
                 XmlPullParser.TEXT -> {
-                    when(currentTag) {
+                    when (currentTag) {
                         "name" -> {
                             Log.v("SIGMA", "name: ${parser.text}")
                             if (parser.text?.trim()?.isNotBlank() == true) {
@@ -49,6 +51,23 @@ class GpxReader {
             eventType = parser.next()
         }
 
-        return Gpx(name, points)
+        var distance = calculateDistance(points)
+        return Gpx(name, points, distance)
+    }
+
+    private fun calculateDistance(points: MutableList<GeoPoint>): Double {
+        var distance = 0.0
+        val out = FloatArray(1)
+
+        for (i in 1..(points.size - 1)) {
+            Location.distanceBetween(
+                points[i - 1].latitude, points[i - 1].longitude,
+                points[i].latitude, points[i].longitude,
+                out
+            )
+            distance += out[0].toDouble()
+        }
+
+        return distance
     }
 }

@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -42,6 +43,7 @@ class TrackViewModel @Inject constructor(
 
     var recordStatus: LiveData<RecordStatus>? = null
     var updateResult = MutableLiveData<Boolean>()
+    var gpxResult = MutableLiveData<Boolean>()
     var tracks = MutableLiveData<Map<String?, List<Track>>>()
     var daySummaries = MutableLiveData<List<DaySummary>>()
     var pointsDeleteResult = MutableLiveData<Boolean>()
@@ -56,22 +58,23 @@ class TrackViewModel @Inject constructor(
         }
     }
 
-    /**
-     * TODO: run in background thread!
-     */
-    fun readGpx(uri: Uri, contentResolver: ContentResolver): Boolean {
-        contentResolver
-            .openInputStream(uri)
-            ?.use { stream ->
-                try {
-                    val gpx = gpxReader.readGpx(stream)
-                    gpxTrack = gpx
-                    return gpx.points.isNotEmpty()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    return false
-                }
-            } ?: return false
+    fun readGpx(uri: Uri, contentResolver: ContentResolver) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                contentResolver
+                    .openInputStream(uri)
+                    ?.use { stream ->
+                        try {
+                            val gpx = gpxReader.readGpx(stream)
+                            gpxTrack = gpx
+                            gpxResult.postValue(gpx.points.isNotEmpty())
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            gpxResult.postValue(false)
+                        }
+                    } ?: gpxResult.postValue(false)
+            }
+        }
     }
 
     @ExperimentalCoroutinesApi

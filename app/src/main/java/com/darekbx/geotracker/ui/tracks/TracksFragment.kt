@@ -272,10 +272,11 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
                 polyline.setPoints(gpx.points)
                 binding.miniMap.overlays.add(polyline)
             }
-        }
 
-        binding.miniMap.invalidateMapCoordinates(binding.miniMap.projection.screenRect)
-        binding.miniMap.overlays.add(miniMapMarker)
+            // Add location marker
+            binding.miniMap.invalidateMapCoordinates(binding.miniMap.projection.screenRect)
+            binding.miniMap.overlays.add(miniMapMarker)
+        }
     }
 
     private fun displayTrack(points: List<SimplePointDto>, color: Int = Color.RED) {
@@ -291,7 +292,15 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun observePointsChanges() {
         tracksViewModel.recordStatus?.observe(viewLifecycleOwner) { recordStatus ->
-            binding.distanceValue.text = getString(R.string.distance_format, recordStatus.distance)
+
+            tracksViewModel.gpxTrack?.let {
+                binding.distanceValue.text =
+                    getString(R.string.distance_gpx_format, recordStatus.distance, (it.distance / 1000))
+            } ?: run {
+                binding.distanceValue.text =
+                    getString(R.string.distance_format, recordStatus.distance)
+            }
+
             binding.speedValue.text = getString(R.string.speed_format, recordStatus.speed * 3.6F)
             binding.timeValue.text = DateTimeUtils.getFormattedTime(recordStatus.time.toInt())
 
@@ -416,12 +425,16 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private val openFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { result ->
         result?.let { uri ->
-            val result = tracksViewModel.readGpx(uri, requireContext().contentResolver)
-            if (result) {
-                setUIMode(isRecording = true)
-                tracksViewModel.createNewTrack()
-            } else {
-                Toast.makeText(requireContext(), "Invalid file!", Toast.LENGTH_SHORT).show()
+            binding.loadingView.visibility = View.VISIBLE
+            tracksViewModel.readGpx(uri, requireContext().contentResolver)
+            tracksViewModel.gpxResult.observe(this) { result ->
+                binding.loadingView.visibility = View.GONE
+                if (result) {
+                    setUIMode(isRecording = true)
+                    tracksViewModel.createNewTrack()
+                } else {
+                    Toast.makeText(requireContext(), "Invalid file!", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
